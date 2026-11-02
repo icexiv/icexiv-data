@@ -1,0 +1,7 @@
+/target/
+/.direnv/
+/dist/
+/result
+/result-*
+/.reference/
+/legacy/

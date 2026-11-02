@@ -1,0 +1,25 @@
+name: Rust
+on: [push, pull_request]
+jobs:
+  nix:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: cachix/install-nix-action@v31
+      - run: nix flake check --print-build-logs
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: wasm32-unknown-unknown
+          components: rustfmt
+      - run: cargo fmt --all --check
+      - run: cargo check --all-targets --all-features --locked
+      - run: cargo test --all-features --locked
+      - run: cargo check --no-default-features --locked
+      - run: cargo check --all-targets --no-default-features --features local --locked
+      - run: cargo check --all-targets --no-default-features --features web --locked
+      - run: cargo check --lib --target wasm32-unknown-unknown --locked
+      - run: cargo check --lib --target wasm32-unknown-unknown --all-features --locked

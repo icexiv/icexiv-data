@@ -1,0 +1,13 @@
+[project]
+name = "icexiv-data"
+
+[[book]]
+title = "IceXIV Data"
+root = "docs"
+exclude = ["**/AGENTS.md"]
+
+[[extensions]]
+kind = "replace"
+imports = { typst = "docs/_components/typst/lib.notc" }
+from = "notist.math"
+to = "typst.math"

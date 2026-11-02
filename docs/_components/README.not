@@ -1,0 +1,43 @@
+#import "pele/lib.notc" as pele;
+#import "typst/lib.notc" as typst;
+
+= Documentation components
+
+The book keeps the Pele diagram and Typst math components under
+`do`. They are copies of the Notist modules used by Icy Bot, so
+the book can render Mermaid-style diagrams and Typst formulas without vendoring
+a second toolchain.
+
+Both components load their pinned browser libraries from a CDN the first time a
+page renders. Building the book does not need network access; viewing the
+generated diagrams and formulas does.
+
+## Pele diagrams
+
+`pele.diagram` accepts Mermaid source and supports the `auto`, `light` and
+`dark` themes:
+
+#pele.diagram(r#"""
+flowchart LR
+    source[Game files] --> decode[Decode]
+    decode --> data[Render-facing data]
+    data --> app[Application]
+"""#)
+
+## Typst math
+
+The project manifest replaces `notist.math` with `typst.math`, so inline and
+block math use Typst syntax throughout the book. Inline formula:
+$x^2 + y^2 = z^2$.
+
+A block formula can select the result type explicitly:
+
+#typst.math<BlockContent>("sum_(i=1)^n i = frac(n(n+1), 2)")
+
+The full Typst entry point is also available for arbitrary markup:
+
+#typst.svg(r#"""
+= Typst SVG
+
+The `typst.svg` function renders complete Typst markup, not only formulas.
+"""#)

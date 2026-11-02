@@ -1,0 +1,27 @@
+[package]
+name = "icexiv-data"
+version = "0.1.0"
+edition = "2024"
+description = "Backend-independent FFXIV data library"
+repository = "https://github.com/icexiv/icexiv-data"
+publish = false
+
+[features]
+default = []
+local = ["dep:tokio"]
+web = ["dep:reqwest", "dep:futures-util"]
+
+[dependencies]
+futures-util = { version = "0.3", default-features = false, features = ["std"], optional = true }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "stream"], optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dependencies]
+tokio = { version = "1", features = ["rt"], optional = true }
+
+[target.'cfg(not(target_arch = "wasm32"))'.dev-dependencies]
+http = "1"
+tokio = { version = "1", features = ["rt"] }
+
+[[example]]
+name = "local_sqpack"
+required-features = ["local"]
