@@ -2,10 +2,10 @@
 
 A fresh start for a backend-independent FFXIV data library.
 
-The active crate provides a backend-independent SqPack container access API with
-optional local and HTTP backends. The default build has no production
-dependencies. There is no standalone CLI or binary format implementation yet;
-the APIs are not constrained by the previous implementation.
+The active crate provides backend-independent SqPack resource extraction with
+optional local and HTTP backends. The default build uses pure-Rust DEFLATE;
+filesystem, HTTP and runtime dependencies remain opt-in. There is no standalone
+CLI. The APIs are not constrained by the previous implementation.
 
 ## SqPack access
 
@@ -28,10 +28,22 @@ async fn read_container_header<S: PackSource>(
 }
 ```
 
-`SqPack::new` performs no I/O. `open` opens a **container file**, not an internal
-resource; index lookup and decompression are not implemented yet. The source
-determines whether a file exists at access time. Confirmed absence becomes
-`MissingFile`; permission, network and other backend errors remain distinct.
+For game resources, use `sqpack.read("exd/item.exh").await?`, which resolves the
+path through an index and extracts the resource bytes. Supported: Win32
+little-endian version-1 `.index`/`.index2` and type-2 standard binary entries,
+with raw or raw-DEFLATE blocks. Model/texture/placeholder content types and
+flagged or ambiguous hash entries return explicit errors, not guessed data.
+EXH/EXD sheet parsing is separate and not implemented yet.
+Parsing and decompression are synchronous CPU work on the polling thread;
+async covers byte acquisition, not automatic background CPU scheduling.
+Fixed binary layouts use `binrw` on in-memory cursors; JAMCRC uses `crc32fast`.
+Range, size, budget and decompression checks remain explicit rather than being
+delegated to unbounded derive-driven collection parsing.
+
+`SqPack::new` performs no I/O. `open` remains the low-level **container file**
+access API. The source determines whether a container exists at access time.
+Confirmed container absence becomes `MissingFile`; a resource lookup miss
+becomes `MissingResource`. Permission, network and decode failures remain errors.
 No directory scan, manifest or HTTP directory-listing endpoint is required.
 `SqPack::open` and built-in backends validate names before I/O: slash-separated
 ASCII letters, digits, `.`, `_` and `-`, with no empty, `.` or `..` components.
@@ -44,8 +56,10 @@ defaults to no per-read byte cap (`None`). Opt in with
 `SqPack::new(source).with_max_read_bytes(Some(bytes))`; `Some(0)` allows only
 empty reads, and `with_max_read_bytes(None)` removes a cap. This is an optional
 `Option<usize>` setting, not a separate configuration type or backend setting.
-Readers capture the setting when opened. Without a cap, a valid read can request
-a large allocation; set one when lengths are untrusted. The cap does not bound
+Readers capture the setting when opened. `read(path)` also checks the declared
+extracted size against the cap before allocating or decompressing the resource.
+Without a cap, a valid read can request a large allocation; set one when lengths
+are untrusted. The cap does not bound
 aggregate concurrent allocations. Backends
 must enforce bounded response handling before allocation, preserve file-version
 consistency across reads, and report permission/transport/version failures as
@@ -73,11 +87,17 @@ use icexiv_data::sqpack::{SqPack, web::Web};
 // Compile with --features web; execute on a native Tokio runtime or a browser task.
 async fn inspect_remote() -> Result<Vec<u8>, Box<dyn std::error::Error>> {
     let source = Web::new("https://assets.example/game/sqpack/")?;
-    let file = "ffxiv/000000.win32.index";
     let sqpack = SqPack::new(source);
-    Ok(sqpack.open(file).await?.read_at(0, 16).await?)
+    Ok(sqpack.read("exd/item.exh").await?)
 }
 ```
+
+Resource lookup normalizes ASCII case, derives category/repository, and probes
+the 256 chunk filenames until found. It prefers `.index` and falls back to
+`.index2` only on confirmed container absence, never on a decode/IO failure.
+A missing path may require 512 opens; indexes are not cached yet. Container
+SHA-1 checksums are not verified. Use stable installations or version-pinned
+HTTP roots: per-file validation does not provide a multi-file release snapshot.
 
 The Web backend requires HEAD with `Content-Length` and a **strong ETag**.
 Reads send `Range` and `If-Match`, require `206`, and validate the response ETag,
@@ -104,8 +124,10 @@ blocking tasks may continue after the awaiting future is cancelled.
 ### Design, dependency and test provenance
 
 This access layer follows the API requirements discussed for this project.
-Neither Physis nor `legacy/` was read or used. No external game-format
-specifications or implementations were consulted. Backend implementation uses
+Neither Physis implementation nor `legacy/` source/tests were consulted. The
+format documentary inputs, license limitations and synthetic test provenance
+are recorded in [SqPack provenance](docs/sqpack-provenance.md). This is not a
+claim of certified clean-room independence. Backend implementation uses
 the public APIs documented by [Tokio](https://docs.rs/tokio/1/tokio/task/fn.spawn_blocking.html)
 (MIT), [reqwest](https://docs.rs/reqwest/0.12/reqwest/) (MIT OR Apache-2.0),
 [futures-util](https://docs.rs/futures-util/0.3/futures_util/) (MIT OR Apache-2.0)
@@ -119,21 +141,17 @@ SqPack format compatibility or browser end-to-end compatibility. This is not a
 claim of strict clean-room independence for the project as a whole. Future
 binary parsers require separately recorded approved specification/test provenance.
 
-### Local container example
+### Local resource example
 
 ```sh
-cargo run --features local --example local_sqpack -- /path/to/game/sqpack ffxiv/000000.win32.index 0 64
+cargo run --features local --example local_sqpack -- /path/to/game/sqpack exd/item.exh
 ```
 
-Replace the relative container name with a file present in your installation.
-Arguments are the SqPack root, relative container name, decimal offset (default
-`0`) and byte length (default `64`, maximum 1 MiB). The example opens that file
-through `PackSource`, then prints the checked raw range as hex. It does **not**
-parse an index, resolve an internal resource path or decompress a resource.
-
-The intended resource-level API will map an internal game path to its extracted
-binary content; interpreting textures, models and other resource formats belongs
-to separate parsers. That resource-level API is not implemented yet.
+Arguments are the SqPack root and a game resource path. The example extracts
+standard binary entries through the built-in Local backend and prints their
+length and first 64 bytes as hex, with a 64 MiB read/output cap. It does **not**
+interpret the extracted EXH/EXD or other resource format. Specialized packed
+model/texture entries remain unsupported.
 
 The example uses the built-in Local backend on a current-thread Tokio runtime;
 filesystem operations run off-thread. Other native platforms return

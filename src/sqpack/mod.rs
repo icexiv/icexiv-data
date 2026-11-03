@@ -1,13 +1,16 @@
-//! Platform-independent access to SqPack container files.
+//! Backend-independent SqPack resource access.
 //!
-//! This module supplies the I/O boundary, not a binary format implementation.
-//! The core performs no I/O, index parsing or decompression. Optional `local`
-//! and `web` modules provide asynchronous backends (behind same-named features).
+//! `SqPack::read` resolves game resource paths and extracts standard binary
+//! entries. Pure byte parsers are separate from asynchronous I/O. Optional
+//! `local` and `web` modules provide backends (behind same-named features).
 //! Futures deliberately have no `Send` bound, so browser-local sources can use them.
 
 use std::error::Error as StdError;
 use std::fmt;
 use std::future::Future;
+
+mod format;
+mod resource;
 
 #[cfg(all(feature = "local", not(target_arch = "wasm32")))]
 pub mod local;
@@ -73,7 +76,24 @@ pub trait PackSource {
 #[derive(Debug, Eq, PartialEq)]
 pub enum Error<E> {
     InvalidFileName(String),
+    InvalidResourcePath(String),
     MissingFile(String),
+    MissingResource(String),
+    InvalidData {
+        file: String,
+        reason: &'static str,
+    },
+    UnsupportedContentType {
+        file: String,
+        kind: u32,
+    },
+    UnsupportedIndexEntry {
+        file: String,
+        reason: &'static str,
+    },
+    AllocationFailed {
+        requested: usize,
+    },
     Source(E),
     ReadTooLarge {
         requested: usize,
@@ -95,7 +115,23 @@ impl<E: fmt::Display> fmt::Display for Error<E> {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidFileName(file) => write!(f, "invalid relative container name: {file}"),
+            Self::InvalidResourcePath(path) => {
+                write!(f, "invalid or unsupported resource path: {path}")
+            }
             Self::MissingFile(file) => write!(f, "container file missing: {file}"),
+            Self::MissingResource(path) => write!(f, "resource not found: {path}"),
+            Self::InvalidData { file, reason } => {
+                write!(f, "invalid SqPack data in {file}: {reason}")
+            }
+            Self::UnsupportedContentType { file, kind } => {
+                write!(f, "unsupported SqPack content type {kind} in {file}")
+            }
+            Self::UnsupportedIndexEntry { file, reason } => {
+                write!(f, "unsupported SqPack index entry in {file}: {reason}")
+            }
+            Self::AllocationFailed { requested } => {
+                write!(f, "could not allocate {requested} bytes")
+            }
             Self::Source(error) => write!(f, "source error: {error}"),
             Self::ReadTooLarge { requested, limit } => {
                 write!(f, "read of {requested} bytes exceeds limit {limit}")
@@ -142,34 +178,38 @@ impl<S: PackSource> SqPack<S> {
         }
     }
 
-    /// Set an optional per-request byte cap for subsequently opened readers.
+    /// Set an optional byte cap for individual reads and extracted resources.
     /// `None` (the default) imposes no cap; `Some(0)` allows only empty reads.
     /// Bounds, arithmetic and response-length checks always apply. This is not
     /// an aggregate-memory limit; set a cap before reading untrusted lengths.
+    /// Resource extraction checks the declared output size before allocation.
     pub fn with_max_read_bytes(mut self, max_read_bytes: Option<usize>) -> Self {
         self.max_read_bytes = max_read_bytes;
         self
     }
 
-    /// Open a container, not a resource inside it. Resource lookup is not yet
-    /// implemented. Valid names are resolved by the source; confirmed absence
+    /// Open a container, not a resource inside it; use [`Self::read`] for that.
+    /// Valid names are resolved by the source; confirmed absence
     /// becomes `MissingFile`, while backend failures remain `Source` errors.
     pub async fn open(&self, file: &str) -> Result<PackReader<S::File>, Error<S::Error>> {
+        self.try_open(file)
+            .await?
+            .ok_or_else(|| Error::MissingFile(file.to_owned()))
+    }
+
+    async fn try_open(&self, file: &str) -> Result<Option<PackReader<S::File>>, Error<S::Error>> {
         if !is_valid_file_name(file) {
             return Err(Error::InvalidFileName(file.to_owned()));
         }
-        let inner = self
-            .source
-            .open(file)
-            .await
-            .map_err(Error::Source)?
-            .ok_or_else(|| Error::MissingFile(file.to_owned()))?;
+        let Some(inner) = self.source.open(file).await.map_err(Error::Source)? else {
+            return Ok(None);
+        };
         let size = inner.len();
-        Ok(PackReader {
+        Ok(Some(PackReader {
             inner,
             size,
             max_read_bytes: self.max_read_bytes,
-        })
+        }))
     }
 }
 

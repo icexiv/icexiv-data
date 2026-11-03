@@ -12,6 +12,9 @@ local = ["dep:tokio"]
 web = ["dep:reqwest", "dep:futures-util"]
 
 [dependencies]
+binrw = { version = "0.15", default-features = false, features = ["std"] }
+crc32fast = "1"
+flate2 = { version = "1", default-features = false, features = ["rust_backend"] }
 futures-util = { version = "0.3", default-features = false, features = ["std"], optional = true }
 reqwest = { version = "0.12", default-features = false, features = ["rustls-tls", "stream"], optional = true }
 
