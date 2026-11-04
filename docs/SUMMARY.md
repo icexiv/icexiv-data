@@ -15,6 +15,10 @@
 
 - [Excel 表格资源](excel/README.md)
 
+# Texture
+
+- [TEX 纹理](tex/README.md)
+
 ---
 
 - [Notist components](_components/README.not)

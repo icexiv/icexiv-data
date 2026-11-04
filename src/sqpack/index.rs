@@ -112,6 +112,11 @@ impl<B: AsRef<[u8]>> Index<B> {
         self.kind
     }
 
+    /// Bytes held by the parsed main index table.
+    pub fn byte_len(&self) -> usize {
+        self.table.as_ref().len()
+    }
+
     pub fn len(&self) -> usize {
         self.table.as_ref().len() / self.kind.stride()
     }

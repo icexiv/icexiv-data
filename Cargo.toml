@@ -36,3 +36,7 @@ required-features = ["local"]
 [[example]]
 name = "show_root_exl"
 required-features = ["local"]
+
+[[example]]
+name = "extract_texture"
+required-features = ["local"]

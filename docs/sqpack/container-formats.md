@@ -2,7 +2,7 @@
 
 # index、index2 与 DAT
 
-以下为 Win32、version 1 容器中用于主索引和标准二进制条目的字段，数值均为小端。图中位置以 **bit** 为单位；未画出的头部字段、辅助表和校验区不在本文范围内。
+以下为 Win32、version 1 容器中用于主索引、标准二进制条目和纹理条目的字段，数值均为小端。图中位置以 **bit** 为单位；未画出的头部字段、辅助表和校验区不在本文范围内。
 
 ## 公共头
 
@@ -168,4 +168,50 @@ packet
 
 按块表顺序拼接解包结果。每块解包长度应与块表一致，总长度应与条目头一致；读取前检查偏移、跨度和文件边界，解压时检查实际输入消耗与输出长度。
 
-当前库支持主索引表和 type-2 提取；不解析辅助碰撞/名称表、模型/纹理专用布局，不验证 SHA-1，匹配到 synonym 或歧义哈希时返回不支持错误。
+### 纹理条目（type-4）
+
+纹理条目复用 24 字节固定前缀，但块表换成等级表，每个等级对应一级 mipmap。
+
+#pele.diagram(r#"""
+packet
+0-31: "Entry header size"
+32-63: "Entry type (4 = texture)"
+64-95: "Total decoded size"
+96-159: "Other fields"
+160-191: "Level count"
+"""#)
+
+等级表从 `+0x18` 开始，每级一条 20 字节记录：
+
+#pele.diagram(r#"""
+packet
+0-31: "Body relative offset of the first data block"
+32-63: "Total stored span of this level"
+64-95: "Decoded size of this level"
+96-127: "Block offset (observed 0, meaning unconfirmed)"
+128-159: "Data block count"
+"""#)
+
+等级表之后是每个数据块对应的一个 `u16` 跨度，按等级顺序排列。该值是从块起点到下一块起点的距离，包含 16 字节块头和块间对齐；最后一块的跨度含义尚未确认。
+
+条目体的位置由条目头长度决定：
+
+```text
+body = entry_start + entry_header_size
+prefix_length = level[0].body_relative_offset
+data_start    = body + prefix_length
+```
+
+体开头的前 `prefix_length` 字节原样复制到输出文件开头，纹理条目中即 TEX 文件头。其余内容按等级顺序、逐块解包拼接：
+
+```text
+output = prefix + decode(block[0]) + decode(block[1]) + ...
+```
+
+同一等级的数据块可超过一块：单块解包后最多 16000 字节，更大的 mipmap 会拆成多块。输出总长度应等于条目头的解码长度。
+
+已知缺口：`block_offset` 的实际含义、最后一块跨度的语义，以及跨度表在多等级纹理中的完整规则仍需对照更多样本确认。
+
+数据块通常从 16 字节边界开始；跨度大于块头加压缩载荷时，差额为填充。DAT 文件可能没有公共头：部分安装会把超过约 2 GB 的数据文件切成不带公共头的分段，这些分段从条目数据开始。
+
+当前库支持主索引表、type-2 与 type-4 提取；不解析辅助碰撞/名称表、模型专用布局，不验证 SHA-1，匹配到 synonym 或歧义哈希时返回不支持错误。

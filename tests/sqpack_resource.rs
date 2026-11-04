@@ -41,12 +41,14 @@ struct Memory {
     fail: HashMap<String, &'static str>,
     opens: Rc<RefCell<Vec<String>>>,
     reads: Reads,
+    fail_read_at: Rc<RefCell<Option<u64>>>,
 }
 
 struct MemoryFile {
     name: String,
     bytes: Rc<Vec<u8>>,
     reads: Reads,
+    fail_read_at: Rc<RefCell<Option<u64>>>,
 }
 
 impl Memory {
@@ -70,6 +72,7 @@ impl PackSource for Memory {
             name: name.to_owned(),
             bytes: bytes.clone(),
             reads: self.reads.clone(),
+            fail_read_at: self.fail_read_at.clone(),
         }))
     }
 }
@@ -80,6 +83,9 @@ impl ReadAt for MemoryFile {
         self.bytes.len() as u64
     }
     async fn read_at(&self, offset: u64, length: usize) -> Result<Vec<u8>, Self::Error> {
+        if *self.fail_read_at.borrow() == Some(offset) {
+            return Err("injected read failure");
+        }
         self.reads
             .borrow_mut()
             .push((self.name.clone(), offset, length));
@@ -472,7 +478,7 @@ fn ambiguous_hashes_and_synonyms_do_not_return_guessed_data() {
 
 #[test]
 fn specialized_entries_are_explicitly_unsupported_not_missing() {
-    for kind in [1, 3, 4, 99] {
+    for kind in [1, 3, 99] {
         let mut memory = fixture(STEM, false, 0, &[(b"data", false)]);
         put32(memory.mutate(&format!("{STEM}.dat0")), 0x804, kind);
         assert!(
@@ -565,4 +571,198 @@ fn empty_binary_entry_and_invalid_paths_have_distinct_results() {
         ));
     }
     assert!(opens.borrow().is_empty());
+}
+
+fn deflate(payload: &[u8]) -> Vec<u8> {
+    let mut encoder =
+        flate2::write::DeflateEncoder::new(Vec::new(), flate2::Compression::default());
+    encoder.write_all(payload).unwrap();
+    encoder.finish().unwrap()
+}
+
+/// Synthetic type-4 entry: 24-byte header, level table, span table, body.
+fn texture_dat(header: &[u8], blocks: &[(&[u8], bool)]) -> Vec<u8> {
+    let encoded: Vec<Vec<u8>> = blocks
+        .iter()
+        .map(|&(payload, compressed)| {
+            if compressed {
+                deflate(payload)
+            } else {
+                payload.to_vec()
+            }
+        })
+        .collect();
+    let spans: Vec<usize> = encoded
+        .iter()
+        .map(|bytes| (16 + bytes.len()).div_ceil(16) * 16)
+        .collect();
+    let mut bytes = container(1);
+    bytes.resize(0x880, 0);
+    let output = header.len() + blocks.iter().map(|(b, _)| b.len()).sum::<usize>();
+    put32(&mut bytes, 0x800, 128);
+    put32(&mut bytes, 0x804, 4);
+    put32(&mut bytes, 0x808, output as u32);
+    put32(&mut bytes, 0x814, 1);
+    put32(&mut bytes, 0x818, header.len() as u32);
+    put32(&mut bytes, 0x81c, spans.iter().sum::<usize>() as u32);
+    put32(
+        &mut bytes,
+        0x820,
+        blocks.iter().map(|(b, _)| b.len() as u32).sum::<u32>(),
+    );
+    put32(&mut bytes, 0x828, blocks.len() as u32);
+    bytes.extend_from_slice(header);
+    for (i, (&(payload, compressed), span)) in blocks.iter().zip(&spans).enumerate() {
+        let start = bytes.len();
+        bytes.resize(start + span, 0);
+        put32(&mut bytes, start, 16);
+        put32(
+            &mut bytes,
+            start + 8,
+            if compressed {
+                encoded[i].len() as u32
+            } else {
+                32000
+            },
+        );
+        put32(&mut bytes, start + 12, payload.len() as u32);
+        bytes[start + 16..start + 16 + encoded[i].len()].copy_from_slice(&encoded[i]);
+        put16(&mut bytes, 0x82c + i * 2, *span as u16);
+    }
+    bytes
+}
+
+fn texture_fixture(header: &[u8], blocks: &[(&[u8], bool)]) -> Memory {
+    let mut memory = Memory::default();
+    memory.insert(format!("{STEM}.index"), index(false, &[(HASH, 0x800 / 8)]));
+    memory.insert(format!("{STEM}.dat0"), texture_dat(header, blocks));
+    memory
+}
+
+#[test]
+fn texture_entries_reassemble_the_prefix_and_every_data_block() {
+    let header = [0x42u8; 80];
+    let first = vec![7u8; 64];
+    let second = vec![9u8; 32];
+    let memory = texture_fixture(&header, &[(&first, true), (&second, false)]);
+    let bytes = block_on(SqPack::new(memory).read(PATH)).unwrap();
+    assert_eq!(&bytes[..80], &header);
+    assert_eq!(&bytes[80..], [first, second].concat());
+}
+
+#[test]
+fn dat_segments_without_a_container_header_are_readable() {
+    let header = [0x42u8; 80];
+    let payload = vec![3u8; 48];
+    let full = texture_dat(&header, &[(&payload, false)]);
+    let mut memory = Memory::default();
+    memory.insert(format!("{STEM}.index"), index(false, &[(HASH, 0)]));
+    // Segment starting directly at the entry, as some installations split dats.
+    memory.insert(format!("{STEM}.dat0"), full[0x800..].to_vec());
+    let bytes = block_on(SqPack::new(memory).read(PATH)).unwrap();
+    assert_eq!(&bytes[..80], &header);
+    assert_eq!(&bytes[80..], payload);
+}
+
+#[test]
+fn texture_entries_reject_inconsistent_tables_and_spans() {
+    let header = [0x42u8; 80];
+    let first = vec![7u8; 64];
+    let second = vec![9u8; 32];
+    for (offset, value, wide) in [
+        (0x814, 0, false),
+        (0x814, u32::MAX, false),
+        (0x808, 1, false),
+        (0x820, 1, false),
+        (0x828, 0, false),
+        (0x82c, 8, true),
+    ] {
+        let mut memory = texture_fixture(&header, &[(&first, true), (&second, true)]);
+        let bytes = memory.mutate(&format!("{STEM}.dat0"));
+        if wide {
+            put16(bytes, offset, value as u16);
+        } else {
+            put32(bytes, offset, value);
+        }
+        assert!(
+            matches!(
+                block_on(SqPack::new(memory).read(PATH)),
+                Err(Error::InvalidData { .. })
+            ),
+            "offset {offset:#x} value {value}"
+        );
+    }
+}
+
+#[test]
+fn texture_rejects_cumulative_output_before_reading_the_overflowing_payload() {
+    let header = [0x42; 80];
+    let payload = [7; 64];
+    let mut memory = texture_fixture(&header, &[(&payload, false), (&payload, false)]);
+    put32(memory.mutate(&format!("{STEM}.dat0")), 0x808, 160);
+    let reads = memory.reads.clone();
+    assert!(matches!(
+        block_on(
+            SqPack::new(memory)
+                .with_max_read_bytes(Some(160))
+                .read(PATH)
+        ),
+        Err(Error::InvalidData {
+            reason: "texture block exceeds remaining output size",
+            ..
+        })
+    ));
+    let second_block = 0x880 + 80 + 80;
+    assert!(
+        !reads
+            .borrow()
+            .iter()
+            .any(|(name, offset, length)| name.ends_with(".dat0")
+                && *offset == second_block
+                && *length > 16)
+    );
+}
+
+#[test]
+fn texture_table_reads_preserve_source_errors() {
+    for offset in [0x818, 0x82c] {
+        let memory = texture_fixture(&[0; 80], &[(&[1; 16], false)]);
+        *memory.fail_read_at.borrow_mut() = Some(offset);
+        assert_eq!(
+            block_on(SqPack::new(memory).read(PATH)),
+            Err(Error::Source("injected read failure"))
+        );
+    }
+}
+
+#[test]
+fn texture_span_table_preserves_read_budget_errors() {
+    let memory = texture_fixture(&[], &[(&[1][..], false); 17]);
+    assert_eq!(
+        block_on(SqPack::new(memory).with_max_read_bytes(Some(32)).read(PATH)),
+        Err(Error::ReadTooLarge {
+            requested: 34,
+            limit: 32
+        })
+    );
+}
+
+#[test]
+fn an_enabled_index_cache_stops_rereading_tables() {
+    let memory = fixture(STEM, false, 0, &[(b"cached", true)]);
+    let reads = memory.reads.clone();
+    let sqpack = SqPack::new(memory).with_index_cache(Some(4096));
+    assert_eq!(block_on(sqpack.read(PATH)).unwrap(), b"cached");
+    let after_first = reads.borrow().len();
+    assert_eq!(block_on(sqpack.read(PATH)).unwrap(), b"cached");
+    let second = reads.borrow().len() - after_first;
+    assert!(
+        second < after_first,
+        "second read {second} vs first {after_first}"
+    );
+    assert!(
+        !reads.borrow()[after_first..]
+            .iter()
+            .any(|(name, _, _)| name.ends_with(".index"))
+    );
 }

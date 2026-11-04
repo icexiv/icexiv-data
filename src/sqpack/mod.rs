@@ -1,7 +1,7 @@
 //! Backend-independent SqPack resource access.
 //!
-//! `SqPack::read` resolves game resource paths and extracts standard binary
-//! entries. Pure byte parsers are separate from asynchronous I/O. Optional
+//! `SqPack::read` resolves game resource paths and extracts standard binary and
+//! texture entries. Pure byte parsers are separate from asynchronous I/O. Optional
 //! `local` and `web` modules provide backends (behind same-named features).
 //! Futures deliberately have no `Send` bound, so browser-local sources can use them.
 //!
@@ -76,20 +76,30 @@
 //!
 //! # Supported extraction and limitations
 //!
-//! Supports Win32 little-endian version-1 index/index2 files and type-2 standard
-//! binary entries with raw or raw-DEFLATE blocks. Other content types (including
-//! models/textures/placeholders) return [`Error::UnsupportedContentType`]; flagged
-//! or ambiguous index entries return [`Error::UnsupportedIndexEntry`].
+//! Supports Win32 little-endian version-1 index/index2 files, type-2 standard
+//! entries and type-4 texture entries, with raw or raw-DEFLATE blocks. Extract
+//! results length-check every table, block span and declared size. Textures are
+//! returned as the concatenated TEX file bytes, ready for [`crate::tex`]; the
+//! container layer does not decode pixels. Other content types (including models)
+//! return [`Error::UnsupportedContentType`]; flagged or ambiguous index entries
+//! return [`Error::UnsupportedIndexEntry`].
+//!
+//! Some installations split large DAT files into segments that begin in the entry
+//! area and carry no container header; such segments are read from offset zero.
 //!
 //! Lookup probes category/repository chunks in ascending order and prefers index
-//! over index2. Without a listing or cache, a miss can require 512 opens. Indexes
-//! are not cached and container SHA-1 checksums are not verified. Per-file
-//! consistency checks are not a cross-file release snapshot. [`Error::MissingResource`]
-//! is distinct from missing containers, malformed data and backend errors.
+//! over index2. Without a listing or cache, a miss can require 512 opens. Enable
+//! [`SqPack::with_index_cache`] to keep parsed tables between calls. Container
+//! SHA-1 checksums are not verified. Per-file consistency checks are not a
+//! cross-file release snapshot. [`Error::MissingResource`] is distinct from
+//! missing containers, malformed data and backend errors.
 
 use std::error::Error as StdError;
 use std::fmt;
 use std::future::Future;
+use std::sync::{Arc, Mutex};
+
+use index::Index;
 
 mod format;
 pub mod index;
@@ -250,6 +260,14 @@ impl<E: StdError + 'static> StdError for Error<E> {
 pub struct SqPack<S> {
     source: S,
     max_read_bytes: Option<usize>,
+    index_cache: Mutex<IndexCache>,
+}
+
+#[derive(Default)]
+struct IndexCache {
+    budget: usize,
+    used: usize,
+    tables: std::collections::BTreeMap<String, Arc<Index<Vec<u8>>>>,
 }
 
 impl<S: PackSource> SqPack<S> {
@@ -258,6 +276,7 @@ impl<S: PackSource> SqPack<S> {
         Self {
             source,
             max_read_bytes: None,
+            index_cache: Mutex::new(IndexCache::default()),
         }
     }
 
@@ -269,6 +288,41 @@ impl<S: PackSource> SqPack<S> {
     pub fn with_max_read_bytes(mut self, max_read_bytes: Option<usize>) -> Self {
         self.max_read_bytes = max_read_bytes;
         self
+    }
+
+    /// Keep parsed index tables in memory, bounded by `budget` bytes of table
+    /// data. `None` (the default) re-reads and re-parses them on every call, which
+    /// is correct but repeats container opens and table reads for bulk lookups.
+    /// The cache belongs to this value and holds no DAT data.
+    pub fn with_index_cache(mut self, budget: Option<usize>) -> Self {
+        self.index_cache = Mutex::new(IndexCache {
+            budget: budget.unwrap_or(0),
+            ..IndexCache::default()
+        });
+        self
+    }
+
+    fn cached_index(&self, name: &str) -> Option<Arc<Index<Vec<u8>>>> {
+        let cache = self.index_cache.lock().unwrap_or_else(|e| e.into_inner());
+        cache.tables.get(name).cloned()
+    }
+
+    fn store_index(&self, name: String, index: Arc<Index<Vec<u8>>>) {
+        let mut cache = self.index_cache.lock().unwrap_or_else(|e| e.into_inner());
+        if cache.budget == 0 {
+            return;
+        }
+        let size = index.byte_len();
+        if size > cache.budget {
+            return;
+        }
+        if cache.used + size > cache.budget {
+            cache.tables.clear();
+            cache.used = 0;
+        }
+        if cache.tables.insert(name, index).is_none() {
+            cache.used += size;
+        }
     }
 
     /// Open a container, not a resource inside it; use [`Self::read`] for that.

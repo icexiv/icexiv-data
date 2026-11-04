@@ -70,6 +70,16 @@ struct BlockRecordRaw {
 
 #[derive(BinRead)]
 #[br(little)]
+struct LodBlockRaw {
+    compressed_offset: u32,
+    compressed_size: u32,
+    decompressed_size: u32,
+    block_offset: u32,
+    block_count: u32,
+}
+
+#[derive(BinRead)]
+#[br(little)]
 struct BlockHeaderRaw {
     size: u32,
     #[br(pad_before = 4)]
@@ -165,6 +175,7 @@ pub(super) fn data_start(bytes: &[u8], start: u64, file_size: u64) -> Result<u64
 pub(super) struct EntryHeader {
     pub kind: u32,
     pub output_size: usize,
+    pub header_size: usize,
     pub body_offset: u64,
     pub table_size: usize,
 }
@@ -179,20 +190,71 @@ pub(super) fn entry_header(bytes: &[u8], start: u64, file_size: u64) -> Result<E
     let kind = header.kind;
     let output_size = usize::try_from(header.output_size).map_err(|_| "resource too large")?;
     let count = u64::from(header.block_count);
-    let table_size = if kind == 2 {
-        let table_size = count.checked_mul(8).ok_or("block table size overflow")?;
-        if table_size > length - 24 {
-            return Err("block table exceeds entry header");
-        }
-        usize::try_from(table_size).map_err(|_| "block table too large")?
-    } else {
-        0
+    let table_size = match kind {
+        2 => count.checked_mul(8).ok_or("block table size overflow")?,
+        4 => count.checked_mul(20).ok_or("lod table size overflow")?,
+        _ => 0,
     };
+    if table_size > length - 24 {
+        return Err("block table exceeds entry header");
+    }
     Ok(EntryHeader {
         kind,
         output_size,
+        header_size: usize::try_from(length).map_err(|_| "entry header too large")?,
         body_offset,
-        table_size,
+        table_size: usize::try_from(table_size).map_err(|_| "block table too large")?,
+    })
+}
+
+/// One level-of-detail record of a texture entry, relative to the entry body.
+#[allow(dead_code)]
+pub(super) struct LodBlock {
+    pub compressed_offset: u32,
+    /// Total stored span of this level, including alignment and padding.
+    pub compressed_size: u32,
+    pub decompressed_size: u32,
+    /// Observed as zero; meaning not established.
+    pub block_offset: u32,
+    pub block_count: u32,
+}
+
+pub(super) fn lod_block(bytes: &[u8]) -> Result<LodBlock> {
+    let record: LodBlockRaw = read(bytes)?;
+    Ok(LodBlock {
+        compressed_offset: record.compressed_offset,
+        compressed_size: record.compressed_size,
+        decompressed_size: record.decompressed_size,
+        block_offset: record.block_offset,
+        block_count: record.block_count,
+    })
+}
+
+/// Fixed prefix of a data block header.
+pub(super) struct BlockHeader {
+    pub header_size: usize,
+    /// Stored payload length, including the header and alignment bytes.
+    pub stored_size: usize,
+    /// Decoded byte count.
+    pub output_size: usize,
+    pub raw: bool,
+}
+
+pub(super) fn block_header(bytes: &[u8]) -> Result<BlockHeader> {
+    let header: BlockHeaderRaw = read(bytes)?;
+    let header_size = usize::try_from(header.size).map_err(|_| "block header too large")?;
+    if header_size < 16 || header_size > bytes.len() {
+        return Err("invalid block header size");
+    }
+    let stored =
+        usize::try_from(header.compressed_size).map_err(|_| "compressed block too large")?;
+    let output_size = usize::try_from(header.output_size).map_err(|_| "block output too large")?;
+    let raw = stored == 32000;
+    Ok(BlockHeader {
+        header_size,
+        stored_size: if raw { output_size } else { stored },
+        output_size,
+        raw,
     })
 }
 
@@ -238,28 +300,18 @@ pub(super) fn validate_blocks(table: &[u8], entry: &EntryHeader, file_size: u64)
 }
 
 pub(super) fn decode_block(bytes: &[u8], expected: usize) -> Result<Vec<u8>> {
-    let header: BlockHeaderRaw = read(bytes)?;
-    let header_size = usize::try_from(header.size).map_err(|_| "block header too large")?;
-    if header_size < 16 || header_size > bytes.len() {
-        return Err("invalid block header size");
-    }
-    let compressed_size = header.compressed_size;
-    let decoded_size = usize::try_from(header.output_size).map_err(|_| "block output too large")?;
-    if decoded_size != expected || expected > usize::from(u16::MAX) {
+    let header = block_header(bytes)?;
+    if header.output_size != expected || expected > usize::from(u16::MAX) {
         return Err("block output size mismatch");
     }
-    let stored = if compressed_size == 32000 {
-        expected
-    } else {
-        usize::try_from(compressed_size).map_err(|_| "compressed block too large")?
-    };
-    let end = header_size
-        .checked_add(stored)
+    let end = header
+        .header_size
+        .checked_add(header.stored_size)
         .ok_or("block payload overflow")?;
     let input = bytes
-        .get(header_size..end)
+        .get(header.header_size..end)
         .ok_or("truncated block payload")?;
-    if compressed_size == 32000 {
+    if header.raw {
         return Ok(input.to_vec());
     }
 

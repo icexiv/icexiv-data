@@ -2,3 +2,4 @@
 
 pub mod excel;
 pub mod sqpack;
+pub mod tex;
