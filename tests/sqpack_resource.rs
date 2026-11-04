@@ -1,5 +1,6 @@
 //! Newly authored synthetic containers, not extracted game files or copied tests.
 
+use icexiv_data::sqpack::index::{Index, IndexHash, IndexKind, Location};
 use icexiv_data::sqpack::{Error, PackSource, ReadAt, SqPack};
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -174,6 +175,131 @@ fn fixture(stem: &str, index2: bool, dat_id: u8, blocks: &[(&[u8], bool)]) -> Me
     );
     memory.insert(format!("{stem}.dat{dat_id}"), dat(blocks));
     memory
+}
+
+#[test]
+fn indexes_enumerate_in_order_including_duplicates_and_synonyms() {
+    for kind in [IndexKind::Index, IndexKind::Index2] {
+        let index2 = kind == IndexKind::Index2;
+        let hash = if index2 { HASH2 } else { HASH };
+        let packed = 0x100 | (7 << 1);
+        let bytes = index(index2, &[(hash, packed), (hash, packed), (42, 1)]);
+        let parsed = Index::parse(&bytes, kind).unwrap();
+        assert_eq!(parsed.kind(), kind);
+        assert_eq!(parsed.len(), 3);
+        assert!(!parsed.is_empty());
+        let entries: Vec<_> = parsed.entries().collect();
+        assert_eq!(entries[0], entries[1]);
+        assert_eq!(entries[0].packed, packed);
+        assert_eq!(
+            entries[0].location(),
+            Some(Location {
+                dat: 7,
+                offset: 0x800
+            })
+        );
+        assert!(!entries[0].is_synonym());
+        assert_eq!(
+            entries[0].hash,
+            if index2 {
+                IndexHash::Index2(HASH2 as u32)
+            } else {
+                IndexHash::Index {
+                    directory: (HASH >> 32) as u32,
+                    filename: HASH as u32,
+                }
+            }
+        );
+        assert!(entries[2].is_synonym());
+        assert_eq!(entries[2].location(), None);
+        assert_eq!(parsed.entries().next_back(), Some(entries[2]));
+        assert_eq!(parsed.entries().len(), 3);
+        let owned = Index::from_table(bytes[0x800..].to_vec(), kind).unwrap();
+        assert_eq!(owned.entries().collect::<Vec<_>>(), entries);
+        assert!(Index::parse(&index(index2, &[]), kind).unwrap().is_empty());
+    }
+}
+
+#[test]
+fn pure_index_parser_rejects_truncation_invalid_headers_and_table_spans() {
+    for kind in [IndexKind::Index, IndexKind::Index2] {
+        let index2 = kind == IndexKind::Index2;
+        let bytes = index(index2, &[(42, 0x100)]);
+        for end in 0..bytes.len() {
+            assert!(Index::parse(&bytes[..end], kind).is_err(), "prefix {end}");
+        }
+        for (offset, value) in [
+            (0, 0),
+            (8, 1),
+            (12, 23),
+            (16, 2),
+            (20, 1),
+            (0x400, 15),
+            (0x404, 2),
+            (0x408, 0x400),
+            (0x408, u32::MAX),
+            (0x40c, 1),
+            (0x40c, u32::MAX),
+        ] {
+            let mut bad = bytes.clone();
+            put32(&mut bad, offset, value);
+            assert!(
+                Index::parse(&bad, kind).is_err(),
+                "offset {offset}, value {value}"
+            );
+        }
+        assert!(Index::from_table(&[0u8; 1][..], kind).is_err());
+    }
+}
+
+#[test]
+fn loading_an_index_never_opens_dat_and_preserves_backend_errors() {
+    for kind in [IndexKind::Index, IndexKind::Index2] {
+        let name = format!(
+            "{STEM}.{}",
+            if kind == IndexKind::Index {
+                "index"
+            } else {
+                "index2"
+            }
+        );
+        let mut memory = Memory::default();
+        memory.insert(name.clone(), index(kind == IndexKind::Index2, &[(42, 1)]));
+        let opens = memory.opens.clone();
+        let sqpack = SqPack::new(memory);
+        let parsed = block_on(sqpack.read_index(&name, kind)).unwrap();
+        assert!(parsed.entries().next().unwrap().is_synonym());
+        assert_eq!(&*opens.borrow(), &[name]);
+    }
+    let mut memory = Memory::default();
+    memory
+        .fail
+        .insert("error.index".to_owned(), "permission denied");
+    let sqpack = SqPack::new(memory);
+    assert!(matches!(
+        block_on(sqpack.read_index("missing.index", IndexKind::Index)),
+        Err(Error::MissingFile(_))
+    ));
+    assert!(matches!(
+        block_on(sqpack.read_index("error.index", IndexKind::Index)),
+        Err(Error::Source("permission denied"))
+    ));
+}
+
+#[test]
+fn index_loading_checks_the_read_budget_before_reading_the_table() {
+    let mut memory = Memory::default();
+    memory.insert("test.index".to_owned(), index(false, &[(1, 0), (2, 0)]));
+    let reads = memory.reads.clone();
+    let sqpack = SqPack::new(memory).with_max_read_bytes(Some(24));
+    assert!(matches!(
+        block_on(sqpack.read_index("test.index", IndexKind::Index)),
+        Err(Error::ReadTooLarge {
+            requested: 32,
+            limit: 24
+        })
+    ));
+    assert!(reads.borrow().iter().all(|(_, offset, _)| *offset < 0x800));
 }
 
 #[test]

@@ -1,5 +1,6 @@
 //! Resource lookup orchestrates byte acquisition; format.rs owns binary parsing.
 
+use super::index::{self, IndexHash, IndexKind};
 use super::{Error, PackReader, PackSource, SqPack, format, is_valid_file_name};
 
 struct ResourcePath {
@@ -108,30 +109,27 @@ impl<S: PackSource> SqPack<S> {
                     (index, index_name, true)
                 }
             };
-            let prefix = index.read_at(0, 24).await?;
-            let header_offset = format::sqpack_header(&prefix, index.len(), 2)
-                .map_err(|e| invalid(&index_name, e))?;
-            let header = index.read_at(header_offset, 16).await?;
-            let header = format::index_header(
-                &header,
-                header_offset,
-                index.len(),
-                if index2 { 8 } else { 16 },
-            )
-            .map_err(|e| invalid(&index_name, e))?;
-            let table = index.read_at(header.offset, header.length).await?;
-            let hash = if index2 {
-                u64::from(path.hash2)
+            let kind = if index2 {
+                IndexKind::Index2
             } else {
-                path.hash
+                IndexKind::Index
             };
-            let Some(location) = format::find_entry(&table, hash, index2).map_err(|e| match e {
-                format::LookupError::Malformed(reason) => invalid(&index_name, reason),
-                format::LookupError::Unsupported(reason) => Error::UnsupportedIndexEntry {
-                    file: index_name.clone(),
-                    reason,
-                },
-            })?
+            let index = index::load(&index, &index_name, kind).await?;
+            let hash = if index2 {
+                IndexHash::Index2(path.hash2)
+            } else {
+                IndexHash::Index {
+                    directory: (path.hash >> 32) as u32,
+                    filename: path.hash as u32,
+                }
+            };
+            let Some(location) =
+                index
+                    .find_entry(hash)
+                    .map_err(|reason| Error::UnsupportedIndexEntry {
+                        file: index_name.clone(),
+                        reason,
+                    })?
             else {
                 continue;
             };

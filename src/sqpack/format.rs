@@ -138,54 +138,14 @@ pub(super) fn index_header(
     Ok(IndexHeader { offset, length })
 }
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub(super) struct Location {
-    pub dat: u8,
-    pub offset: u64,
-}
-
-pub(super) enum LookupError {
-    Malformed(&'static str),
-    Unsupported(&'static str),
-}
-
-pub(super) fn find_entry(
-    table: &[u8],
-    hash: u64,
-    index2: bool,
-) -> std::result::Result<Option<Location>, LookupError> {
-    let stride = if index2 { 8 } else { 16 };
-    if !table.len().is_multiple_of(stride) {
-        return Err(LookupError::Malformed("partial index record"));
+pub(super) fn index_record(bytes: &[u8], index2: bool) -> Result<(u64, u32)> {
+    if index2 {
+        let entry: Index2EntryRaw = read(bytes)?;
+        Ok((u64::from(entry.hash), entry.packed))
+    } else {
+        let entry: IndexEntryRaw = read(bytes)?;
+        Ok((entry.hash, entry.packed))
     }
-    let mut found = None;
-    for entry in table.chunks_exact(stride) {
-        let (key, packed) = if index2 {
-            let entry: Index2EntryRaw = read(entry).map_err(LookupError::Malformed)?;
-            (u64::from(entry.hash), entry.packed)
-        } else {
-            let entry: IndexEntryRaw = read(entry).map_err(LookupError::Malformed)?;
-            (entry.hash, entry.packed)
-        };
-        if key != hash {
-            continue;
-        }
-        if found.is_some() {
-            return Err(LookupError::Unsupported(
-                "ambiguous duplicate hash; collision resolution not supported",
-            ));
-        }
-        if packed & 1 != 0 {
-            return Err(LookupError::Unsupported(
-                "flagged/synonym index entries not supported",
-            ));
-        }
-        found = Some(Location {
-            dat: ((packed >> 1) & 7) as u8,
-            offset: u64::from(packed & !15) * 8,
-        });
-    }
-    Ok(found)
 }
 
 /// Reflected CRC-32/JAMCRC (init all ones, no final xor).

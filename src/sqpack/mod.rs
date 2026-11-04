@@ -92,6 +92,7 @@ use std::fmt;
 use std::future::Future;
 
 mod format;
+pub mod index;
 mod resource;
 
 #[cfg(all(feature = "local", not(target_arch = "wasm32")))]
