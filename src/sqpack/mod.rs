@@ -4,6 +4,88 @@
 //! entries. Pure byte parsers are separate from asynchronous I/O. Optional
 //! `local` and `web` modules provide backends (behind same-named features).
 //! Futures deliberately have no `Send` bound, so browser-local sources can use them.
+//!
+//! # Resource paths versus container names
+//!
+//! [`SqPack::read`] accepts game paths such as `exd/item.exh`, normalizes ASCII
+//! case, locates the index entry and returns the extracted bytes. It does not
+//! interpret the extracted file's format. [`SqPack::open`] is lower level: it
+//! opens a physical container name relative to the SqPack root, such as
+//! `ffxiv/0a0000.win32.index`, for checked offset reads through [`PackReader`].
+//! Neither operation requires a directory listing or registration of files.
+//!
+//! # Basic use with any backend
+//!
+//! ```no_run
+//! use icexiv_data::sqpack::{Error, PackSource, SqPack};
+//!
+//! async fn extract_item_header<S: PackSource>(
+//!     source: S,
+//! ) -> Result<Vec<u8>, Error<S::Error>> {
+//!     let sqpack = SqPack::new(source)
+//!         .with_max_read_bytes(Some(64 * 1024 * 1024));
+//!     sqpack.read("exd/item.exh").await
+//! }
+//! ```
+//!
+//! `SqPack::new` performs no I/O. Its byte cap defaults to `None` (no limit).
+//! Opting into a cap bounds individual reads and declared extracted sizes, not
+//! aggregate memory or concurrent requests. Overflow, range and response-length
+//! checks always apply, even without a cap. Parsing/decompression run on the
+//! polling thread; async I/O does not automatically offload CPU work.
+//!
+//! # Built-in backends
+//!
+//! Enable `local` for `sqpack::local::Local` on native platforms. Its root is
+//! **`game/sqpack`**, not `game`; filesystem work uses Tokio's blocking pool.
+//! Keep the installation stable while reading it.
+//!
+//! ```no_run
+//! # #[cfg(all(feature = "local", not(target_arch = "wasm32")))]
+//! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! use icexiv_data::sqpack::{SqPack, local::Local};
+//!
+//! // Run inside a Tokio runtime.
+//! let source = Local::new("/path/to/game/sqpack").await?;
+//! let bytes = SqPack::new(source).read("exd/item.exh").await?;
+//! # let _ = bytes;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! Enable `web` for `sqpack::web::Web` on native or browser WASM. Native HTTP
+//! uses Tokio; browser HTTP uses Fetch. Serve unencoded containers under a
+//! version-pinned root with HEAD, strong ETags and single-range GET support.
+//! Cross-origin browser access also requires appropriate CORS headers; see
+//! that backend's module documentation.
+//!
+//! ```no_run
+//! # #[cfg(feature = "web")]
+//! # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+//! use icexiv_data::sqpack::{SqPack, web::Web};
+//!
+//! let source = Web::new("https://assets.example/game/sqpack/")?;
+//! let bytes = SqPack::new(source).read("exd/item.exh").await?;
+//! # let _ = bytes;
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! Custom backends implement [`PackSource`] and [`ReadAt`]. Only confirmed
+//! absence is `Ok(None)`; permission, transport and decode failures are errors.
+//!
+//! # Supported extraction and limitations
+//!
+//! Supports Win32 little-endian version-1 index/index2 files and type-2 standard
+//! binary entries with raw or raw-DEFLATE blocks. Other content types (including
+//! models/textures/placeholders) return [`Error::UnsupportedContentType`]; flagged
+//! or ambiguous index entries return [`Error::UnsupportedIndexEntry`].
+//!
+//! Lookup probes category/repository chunks in ascending order and prefers index
+//! over index2. Without a listing or cache, a miss can require 512 opens. Indexes
+//! are not cached and container SHA-1 checksums are not verified. Per-file
+//! consistency checks are not a cross-file release snapshot. [`Error::MissingResource`]
+//! is distinct from missing containers, malformed data and backend errors.
 
 use std::error::Error as StdError;
 use std::fmt;
