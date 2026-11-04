@@ -28,3 +28,7 @@ tokio = { version = "1", features = ["rt"] }
 [[example]]
 name = "local_sqpack"
 required-features = ["local"]
+
+[[example]]
+name = "show_root_exl"
+required-features = ["local"]

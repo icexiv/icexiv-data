@@ -1,5 +1,4 @@
-//! Byte-only SqPack parsing. Documentary sources and limitations are recorded
-//! in docs/sqpack-provenance.md. No filesystem, HTTP or async dependencies here.
+//! Byte-only SqPack parsing. No filesystem, HTTP or async dependencies here.
 
 use binrw::{BinRead, Endian};
 use flate2::{Decompress, FlushDecompress, Status};

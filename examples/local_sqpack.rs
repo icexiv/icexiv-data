@@ -1,5 +1,18 @@
 //! Extract a standard binary game resource using the asynchronous Local backend.
 //! Does not parse the extracted resource's own file format.
+//!
+//! # Usage
+//!
+//! ```sh
+//! cargo run --features local --example local_sqpack -- /path/to/game/sqpack exd/item.exh
+//! ```
+//!
+//! Arguments are the SqPack root (`game/sqpack`, not `game`) and a resource path.
+//! Prints the extracted byte length and a hex preview of the first 64 bytes.
+//! Supports standard binary entries, not specialized model/texture entries.
+//! Reads and extracted output are capped at 64 MiB. Requires a native platform;
+//! the example creates its own Tokio runtime. Keep the installation stable while
+//! reading it.
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
