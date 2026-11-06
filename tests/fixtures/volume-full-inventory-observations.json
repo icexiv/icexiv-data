@@ -1,0 +1,12 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "report_sha256": "a4058e67025c06a8c4d432a7fc99e9ea1455288b78578bfed84b40a27836226b",
+  "counterpart_report_sha256": "1c9415d01699cdd79a8ea765d9512f62fbb94c3b47ce522e819205069ff9058c",
+  "indexes": 59,
+  "selected_records": 1802972,
+  "complete_entries": 209,
+  "incomplete_entries": 273,
+  "images_verified": 1940,
+  "pixels_verified": 2370564
+}

@@ -1,6 +1,6 @@
 //! Excel header metadata and page-path generation; no I/O or schema-name lookup.
 
-use super::{Error, Result, read, table_end};
+use super::{Error, Limits, Result, read, reserve, sort_work, spend, table_end};
 use binrw::{BinRead, Endian};
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -160,6 +160,12 @@ pub struct Exh {
 
 impl Exh {
     pub fn parse(bytes: &[u8]) -> Result<Self> {
+        Self::parse_with_limits(bytes, Limits::default())
+    }
+    pub fn parse_with_limits(bytes: &[u8], limits: Limits) -> Result<Self> {
+        if bytes.len() > limits.max_input_bytes {
+            return Err(Error::BudgetExceeded("EXH input"));
+        }
         let raw: HeaderRaw = read(bytes, Endian::Big)?;
         if raw.version != 3 {
             return Err(Error::UnsupportedVersion {
@@ -176,10 +182,17 @@ impl Exh {
         let columns_end = table_end(bytes, 32, usize::from(raw.columns), 4)?;
         let pages_end = table_end(bytes, columns_end, usize::from(raw.pages), 8)?;
         let languages_end = table_end(bytes, pages_end, usize::from(raw.languages), 2)?;
-        let mut columns = Vec::new();
-        columns
-            .try_reserve_exact(usize::from(raw.columns))
-            .map_err(|_| Error::AllocationFailed)?;
+        if usize::from(raw.columns) > limits.max_columns {
+            return Err(Error::BudgetExceeded("columns"));
+        }
+        let mut allocation = limits.max_metadata_bytes;
+        let mut work = limits.max_work;
+        spend(
+            &mut work,
+            usize::from(raw.columns) + usize::from(raw.pages) + usize::from(raw.languages),
+            "EXH fields",
+        )?;
+        let mut columns = reserve(usize::from(raw.columns), &mut allocation)?;
         for record in bytes[32..columns_end].as_chunks::<4>().0 {
             let column: ColumnRaw = read(record, Endian::Big)?;
             let data_type = ColumnType::from_id(column.kind)?;
@@ -191,10 +204,7 @@ impl Exh {
                 offset: column.offset,
             });
         }
-        let mut pages = Vec::new();
-        pages
-            .try_reserve_exact(usize::from(raw.pages))
-            .map_err(|_| Error::AllocationFailed)?;
+        let mut pages = reserve(usize::from(raw.pages), &mut allocation)?;
         for record in bytes[columns_end..pages_end].as_chunks::<8>().0 {
             let page: PageRaw = read(record, Endian::Big)?;
             if u64::from(page.start_id) + u64::from(page.row_count) > u64::from(u32::MAX) + 1 {
@@ -205,6 +215,7 @@ impl Exh {
                 row_count: page.row_count,
             });
         }
+        spend(&mut work, sort_work(pages.len())?, "page sorting")?;
         pages.sort_unstable_by_key(|p| p.start_id);
         for pair in pages.windows(2) {
             if pair[0].start_id == pair[1].start_id
@@ -214,13 +225,11 @@ impl Exh {
                 return Err(Error::InvalidData("duplicate or overlapping page ranges"));
             }
         }
-        let mut languages = Vec::new();
-        languages
-            .try_reserve_exact(usize::from(raw.languages))
-            .map_err(|_| Error::AllocationFailed)?;
+        let mut languages = reserve(usize::from(raw.languages), &mut allocation)?;
         for record in bytes[pages_end..languages_end].as_chunks::<2>().0 {
             // Unlike the header/column/page fields, language IDs are little-endian.
             let language = Language::from_id(read(record, Endian::Little)?)?;
+            spend(&mut work, languages.len(), "language uniqueness")?;
             if languages.contains(&language) {
                 return Err(Error::InvalidData("duplicate language"));
             }

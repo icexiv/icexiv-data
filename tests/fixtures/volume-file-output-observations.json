@@ -1,0 +1,80 @@
+{
+  "kind": "bounded-binary-file-open-callers-and-output-layout-static-evidence",
+  "version": "2026.10.06.0000.0000",
+  "platform": "PE32+ AMD64; preferred image base 0x140000000",
+  "binary_bytes": 51910400,
+  "binary_sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "evidence_directory": "../icexiv-data-evidence/volume-texture-writer-09",
+  "evidence_manifest_sha256": "72037cf32ba74404fad5951554ffcf28428def9a0c0aeafb38bb872860e8eebe",
+  "sealed_files": 148,
+  "sealed_bytes": 487267,
+  "reports": [
+    {"file": "REVIEW.md", "sha256": "dd6d2873fa6e614cb5ce1b1cdd84f1ecf6841210e41e222775e849192abd251e"},
+    {"file": "review.json", "sha256": "ae90b3f1a958270b71f859a94e912756cb5346ad7edee09ba84accceed6253c9"},
+    {"file": "validation.json", "sha256": "74d149336534963670a8f7b203838f04f9157b0737bc7b53ad3054158a6ca922"},
+    {"file": "verify.py", "sha256": "e56c4e83a6b15e6b2784d35d1a7067d053c9d203adf15d199d68b2c87eee8eb6"},
+    {"file": "direct-callers.json", "sha256": "2d71a3b47f0b0058a4dffb8a2ee56bd87ede4eefe446c44259d4650a14e2e421"},
+    {"file": "triage.json", "sha256": "a58fbb31f5638f16f4d1ee340b89cd13ffdc2584a58f9ee358435a1399f272e8"},
+    {"file": "literals.json", "sha256": "7c72aed3232add49f77de6c5786afa6c4cd15b910a11cc328a26a0ac75294a63"},
+    {"file": "provenance.json", "sha256": "5c6b7dc95a7dbfc91fffc6922f490599d2d490a2816c8e9f5309143189d9d2e1"}
+  ],
+  "query": {
+    "seed_va": "0x141de08a8",
+    "query_count": 1,
+    "encoding_scope": "E8/E9 rel32 candidates in file-backed executable sections",
+    "searched_bytes": 34640896,
+    "e8_e9_byte_positions_examined": 788558,
+    "direct_calls": 16,
+    "direct_tailcalls": 0,
+    "caller_roots": 11,
+    "instruction_boundary_confirmed": 16,
+    "truncated": false,
+    "query_repeated_by_verifier": false
+  },
+  "verified_coverage": {
+    "captures": 34,
+    "function_roots_including_positive_callee": 12,
+    "complete_bodies": 4,
+    "code_bytes_including_repeated_prefixes": 8004,
+    "unique_code_bytes": 5415,
+    "data_bytes": 149,
+    "decoded_instruction_rows_with_repeats": 1789,
+    "semantic_anchor_instructions": 18,
+    "dataflow_span_instructions": 182,
+    "full_validation_result_equal": true,
+    "exact_archive_file_set_equal": true
+  },
+  "bmp_observation": {
+    "wrapper_va": "0x1402320a0",
+    "writer_va": "0x140232260",
+    "header_bytes": [14, 40],
+    "magic_hex": "424d",
+    "pixel_data_offset": 54,
+    "bits_per_pixel": 24,
+    "row_order": "source height-1-y",
+    "row_bytes": "u32(3 * u32(width+1)) & 0xfffffffc",
+    "input_pixel_stride": 4,
+    "output_pixel_stride": 3,
+    "explicit_row_padding_initialization_observed": false,
+    "mip_or_depth_loop_observed": false,
+    "runtime_file_output_observed": false
+  },
+  "encoding_table_observation": {
+    "writer_vas": ["0x1401f6780", "0x1401f6e40"],
+    "record_count": 256,
+    "field_write_bytes": [1, 4, 4],
+    "requested_bytes": 2304,
+    "caller_supplied_stream_mode_established": false
+  },
+  "limits": [
+    "A bounded positive helper-call route, not an exhaustive save-API or indirect-call survey",
+    "Six text-mode callers and two inherited AMB entries received prefix-level analysis only",
+    "No claim that TEX writers are globally absent",
+    "No target execution; upstream production tooling and missing-mip content remain unknown"
+  ],
+  "tex_prefix_writer_identified": false,
+  "mip_generator_identified": false,
+  "six_level_reconstruction_count": 0,
+  "short_resources": 273,
+  "missing_logical_bytes": 603624
+}

@@ -1,0 +1,18 @@
+{
+  "version":"2026.10.06.0000.0000","platform":"Win32",
+  "inventory_sha256":"bf590440b2a56d1b6a9cb407ce0abc11055b5513df9c349f5a47a3d7c9a66918",
+  "stratified_inventory_sha256":"6da93f6d97133402e89975916d6d09416efaaeafe3a0b3bdf22273a7802c6463",
+  "overlap_observations":[0.009672198277099794],
+  "samples":[{
+    "dat":"ffxiv/040000.win32.dat0","offset":12471626112,
+    "index_ordinal":5525,"index_hash":"03fe5207c9e63460",
+    "sha256":"15154ed9d9697004e352616f3205b4cc3cb3b9a24f4cd2ae43ae23d81dcdfece",
+    "bytes":1263624,"sampled_coefficients":4741800,
+    "rust_rows_sha256":"4692cd41d4efb8b60b7c5f9eefbc7b618bed7f8972bbaed2aff18fb771ceebcf",
+    "tagfile_offset":66,"tagfile_end":1263376,"padding_bytes":10,
+    "classes":32,"objects":4,"animation_object_ids":[4],"binding_object_ids":[3],
+    "max_array_length":2000000,"observer_max_values":8000000,
+    "sample_boundaries":true,
+    "expected_default_error":"BudgetExceeded(\"array length\")"
+  }]
+}

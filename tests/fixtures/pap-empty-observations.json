@@ -1,0 +1,10 @@
+{
+  "version":"2026.10.06.0000.0000","platform":"Win32",
+  "samples":[{
+    "empty":true,"dat":"ffxiv/040000.win32.dat0","offset":8369887616,
+    "index_ordinal":79,"index_hash":"000a40e56259446d","bytes":32,
+    "sha256":"9d62de1998e513259f00c1cd2db582e15150f35bfa25d30ed983d7257156c09e",
+    "tagfile_offset":26,"tagfile_end":32,"padding_bytes":6,
+    "rust_rows_sha256":"896f58d42d650639b9e280045e3cd7ff2296f4dc80900de7c8e82c61a4d32292"
+  }]
+}

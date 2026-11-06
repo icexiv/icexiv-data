@@ -1,0 +1,12 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "report_sha256": "3dedb3a10e4dd347f40ba02625c649d8c598f0e48c0b1411aff978665ecefd56",
+  "discovery_report_sha256": "8552ccdfef92a9b23d6e8d668538aec16c8a6c0ad35b2806dea0d45f4993897e",
+  "limitations": "Four actual bgcommon/bg MDLs with high UV usage indices and all declared ordinary geometry; raw scalar semantics, not an inferred flow/shader meaning or normal1/bitangent1 coverage.",
+  "samples": [
+    {"index":"ffxiv/010000.win32.index","ordinal":23516,"hash":"50839fddbbac73dd","dat":"ffxiv/010000.win32.dat1","offset":1043472512,"sha256":"419fe598965c429a67a6d44a04de02fc0e98935166b20b99c2b10bfebbab0ddc"},
+    {"index":"ffxiv/010000.win32.index","ordinal":35754,"hash":"7303de8335346a96","dat":"ffxiv/010000.win32.dat1","offset":224851072,"sha256":"f5e7ac14d31d9502a5f8f2e6585e48cb885b2d4d4c834beafe3003423bf3ce2d"},
+    {"index":"ffxiv/010000.win32.index","ordinal":57934,"hash":"bece785a444b43ce","dat":"ffxiv/010000.win32.dat1","offset":978169728,"sha256":"36b99cfe262e70409bd221166ca919a52fdf34ebb8f558746b88f2a7c0dfdbec"},
+    {"index":"ffxiv/020000.win32.index","ordinal":466,"hash":"01119e63575f6a3c","dat":"ffxiv/020000.win32.dat1","offset":852543616,"sha256":"ce900f29dcbeb553a0b5455893414227972fd21ca29b8dca38d13a00523b94a1"}
+  ]
+}

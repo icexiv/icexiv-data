@@ -1,0 +1,13 @@
+{
+  "version":"2026.10.06.0000.0000",
+  "platform":"Win32",
+  "sheets":[
+    {"name":"Item","pages":[0,2500,50000],"language":5,"header_sha256":"c5781f32c0a5270d92bb51481acb17f5c7c6ab5e25994f44c9b83c9874fd4ebe","rows_sha256":"4caca5797e048672309310e52e620d416cea5720838c987a08360b1d66ba655a","page_sha256":["607cecbbf7933f3aeac839098f52d200d61e27c7b5dd4220928bcfbca2450c18","0b2a18db1e2f3bce03fc3f20dd6ea5fe29b1c9e0f0bcd0d6b84c4ec851db822c","c2348e2b8d62a4bafe5e741d6a675e941ce51e1557ba0b9440786452676c6600"]},
+    {"name":"ModelChara","pages":[0],"language":0,"header_sha256":"9eefbb664ff69afd255023d46ff114a9d234b346097bb8b8be48a0e55722d138","rows_sha256":"0946262fd8c1412b317bb1ac4af5595fa69f00167a225a05b1304ea5a243d088","page_sha256":["1644e71029ff84de38627ab6bfb3b343f2d7d16dd30bd4ac8ff011080d2e6c7d"]},
+    {"name":"HousingFurniture","pages":[196608],"language":0,"header_sha256":"5b293faafb07d9a169ed9897790cfdc68c42a5916e0568d1a79128d44b2d9bdd","rows_sha256":"833dd9a12c1c6e622210ce497a8afdf546aac9cfbc4e11522f388344b1c9b71b","page_sha256":["0a97cc95c36e971d4252edbc57075e039db07d97746433fbeeca01fdbcacfe47"]},
+    {"name":"EquipSlotCategory","pages":[0],"language":0,"header_sha256":"4b878af0d2f6f9b05532de1a9e58860ee398d48bcb2530215c955adbcf5b2629","rows_sha256":"4a4406f0d7eeb9d69133eb090bba896703126ac6851e7b5054b9206f0d0a771f","page_sha256":["1dd9b01baef8e6bab5a373bb61f9d11a8bf9eb34b981be5f072fcb7129417bcc"]},
+    {"name":"GilShopItem","pages":[262144],"language":0,"header_sha256":"025570ad6ca5f4013ad70763bb9c5bc1972c563a2a570779816ca59aef88f609","rows_sha256":"3dc2e7f5369d0546c07edbb88f9c47b6514a6c9bf68036717343a5b99b97f03b","page_sha256":["b3892f18692fc7f96ed40f2d67d7e60be6d949a550d077f8fe8e297af3f29a38"]},
+    {"name":"GatheringItemPoint","pages":[1],"language":0,"header_sha256":"db18d782f245dcc7c63672cc28475ddb1b6b62acb73740af689423dbf06c91ab","rows_sha256":"dc9b4b7bf5fe1f1676abdc114c52a94767edd3f347d8af99519d4ef79d5a147e","page_sha256":["419d888226482a0185af3ee17f0c1c819d62d6fbe73e2275e47fd1428c34ea45"]},
+    {"name":"CustomTalkDefineClient","pages":[0],"language":0,"header_sha256":"7d03e27f4536e5a14ce3ffa4a020b4f1e8faca1f40965ec5470b73eacf1e5991","rows_sha256":"0d6e0d460d3dea3efa4f813aade41f002768168f75afab3e0064dc00fc44a5d7","page_sha256":["f66d743abf9d7b0c40e9c0864a465fae5dfb4596eb885af5dabaa2251a7a09f4"]}
+  ]
+}

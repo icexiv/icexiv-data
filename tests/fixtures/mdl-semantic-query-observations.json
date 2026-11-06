@@ -1,0 +1,10 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "source_sha256": "66be81af7fbbd368b14052cde9dedcd047efdf12f87e5f522672a10ac9b4b425",
+  "report_sha256": "d9bd3650b8f0c291aa9b64854cd894e8e7faf2c2a507ce87dade35e74fee17b2",
+  "vertices_per_case": 2007,
+  "cases": 8,
+  "queries": 138552,
+  "limitations": "One actual mesh and seven declaration-only controls, not seven additional game-generated files. No claim that duplicate semantics are forbidden by the file format."
+}

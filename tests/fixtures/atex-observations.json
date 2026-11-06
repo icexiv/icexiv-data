@@ -1,0 +1,11 @@
+{
+  "version":"2026.10.06.0000.0000",
+  "platform":"Win32",
+  "samples":[
+    {"path":"vfx/cut/aktkma/aktkma10910/texture/bom_smk_msk.atex","sha256":"d86e145ee48f4026930cf062a5d8b088a3cd51679be3d2ea27ad553dc14aa88e","rows_sha256":"4c479e4a29420bb600b46fa3419b1b455f2c3904da7adf3ec8f304dc8d48abd3"},
+    {"path":"vfx/cut/aktkma/aktkma10910/texture/dist_002f.atex","sha256":"afa265800621c8abfbbcf1b495c615a1244e2a625455ce9b887231d06f2b9abf","rows_sha256":"8073ab2bb943524eeeee60c5f2191477ba14f77afa1876733f320a012602dab2"},
+    {"path":"vfx/cut/aktkml/aktkml10420/texture/uv_prizm01_i_a1.atex","sha256":"43513e1e04c26184b6f2f4f332bd448a618d96deb4d29fc8b4a6c7f067820b35","rows_sha256":"73b6736b767d4fa7351c46f0f2045667c2a2f8cb37786e18143e1c194193b5bc"},
+    {"path":"vfx/cut/aktkml/aktkml10420/texture/glow02_u1.atex","sha256":"164d3e52a3e76328cf716e64a9c48317058efaa17935015196731902632959e8","rows_sha256":"8d0803bea72cb7f5716b5eff98e1e515a5da2029f8560a9f5d19b68532a18f9e"},
+    {"path":"vfx/cut/heavne/heavne11030/texture/cube004_o.atex","sha256":"c7e114017ba3969dfeabdcebaf4e8c5ec54420e053fdce212fc45af439853dd2","rows_sha256":"1bbca5ceb317756b430a01242bb2b34d9dcc562865d353827b04ce67b1c8a7ac"}
+  ]
+}

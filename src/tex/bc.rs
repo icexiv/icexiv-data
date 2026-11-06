@@ -1,9 +1,9 @@
 //! BC1/2/3/4/5 decoding from the documented block layouts. Inputs and output
 //! lengths have already been checked by the TEX parser and decode budget.
 
-use super::{Format, Mip, expand5};
+use super::{Format, Surface, expand5};
 
-pub(super) fn decode(mip: Mip<'_>, output: &mut [u8]) {
+pub(super) fn decode(mip: Surface<'_>, output: &mut [u8]) {
     let width = usize::from(mip.width);
     let height = usize::from(mip.height);
     let columns = width.div_ceil(4);

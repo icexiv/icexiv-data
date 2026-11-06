@@ -1,0 +1,95 @@
+{
+  "kind": "historic-source-audit-and-instruction-verified-CPU-gates-not-production-reconstruction",
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32 captured resources; Linux x86-64 CPU oracles",
+  "input_observations": "volume-generator-cohort-observations.json",
+  "evidence_directory": "../icexiv-data-evidence/volume-generator-04",
+  "evidence_manifest_sha256": "0c5a313f0e53e33a6c1147b7ff1ed2074b4a0d7b495fd2581ed56c1814230595",
+  "sealed_files": 227,
+  "sealed_bytes": 4966191,
+  "archive_validation_sha256": "514d7c091d37a26d0127d9a0506ba7909bf23544b445c1fca18f2d524385bec8",
+  "reports": [
+    {"file": "source-history.json", "sha256": "0ad70a1878c500c29d5891b1ef922738e5e970101153d8810b3b19ecfabc2d1d"},
+    {"file": "source-traces.json", "sha256": "fecd59202eb836b68885376c6bcf2274e1558e6e0a485a21ad8e61a91d273c52"},
+    {"file": "trace-verification.json", "sha256": "b0194c602d0ad12afc0c433993a8ce1f084da833a2abcefc2b349e272920ceff"},
+    {"file": "instruction-review.json", "sha256": "e3ddbcd7068d84dee133f20d0ff1767d64bf151acc356cf8e263c6a3fa22887d"},
+    {"file": "x87-no-vectorization/instruction-review.json", "sha256": "c234ddc826a0268e36d0d79a4328361a1ae19149722a21171f8b0880b08f942f"},
+    {"file": "x87-gate.json", "sha256": "ef534dbfc27221875e0337631bd2aa5edfefce319c8afc278a701492fc0566bf"},
+    {"file": "x87-no-vectorization/x87-gate.json", "sha256": "9e0962fb08fd0bfa065f5b735dcc77cfca6d8a75a1ee8a68d86c31c5308a8970"},
+    {"file": "x87-arithmetic-verification.json", "sha256": "c9bcfd68b94d575ea4f0f4521a000418e4fe21966ba5d971143ec06529e6e11f"},
+    {"file": "archive-validation.json", "sha256": "514d7c091d37a26d0127d9a0506ba7909bf23544b445c1fca18f2d524385bec8"}
+  ],
+  "historic_source_audit": {
+    "versions": [
+      {"tag": "jan2014", "revision": "73267aa79794220f9c283aac8955ab06627054ef", "license": "MS-PL", "dither_macro_line": 2492, "ordered_round_operand": "v"},
+      {"tag": "feb2014", "revision": "183937c3f767c19b41d05152ca53dea1757bceaa", "license": "MS-PL", "dither_macro_line": 3247, "ordered_round_operand": "target"},
+      {"tag": "mar2015", "revision": "b036f8906b3ff96deed0526c114ca1596f4d09be", "license": "MIT", "dither_macro_line": 3586, "ordered_round_operand": "target"}
+    ],
+    "original_files": 9,
+    "independently_verified_line_anchors": 18,
+    "triangle3d_source": "previous mip",
+    "bgra8_mip_store": "linear store without ordered dither",
+    "ordered_phase": "physical x",
+    "historical_sources_compiled": false
+  },
+  "source_trace_comparison": {
+    "seeds": 152,
+    "unique_chains": 353,
+    "selected_coordinate_channels": 223366,
+    "mips": [1, 2, 3],
+    "scalar": {"directed_matches": 26, "unordered_pairs": 13, "conflicts": 0},
+    "rgba": {"directed_matches": 26, "unordered_pairs": 13, "conflicts": 0},
+    "independent_match_check": "folded integer taps and complete trace byte equality"
+  },
+  "cpu_gates": {
+    "witness_rows": 8,
+    "base_resources": 6,
+    "compared_bytes_per_build": 116,
+    "auto_vectorized": {
+      "binary_sha256": "6621e2dccfef59ea1b261cb9b29151caec90b6793a70cfd3cb2aa76cad9018a9",
+      "actual_normalization": "binary32 divps by 255",
+      "actual_reduction": "binary32 mulps/addps",
+      "different_bytes": 2,
+      "different_seeds": 2
+    },
+    "unvectorized": {
+      "binary_sha256": "f7081091ec40e2ea1bc6a5af5fa013690dfad913e044c438a4fae180832a441c",
+      "actual_normalization": "x87 division by 255 then binary32 store",
+      "actual_reduction": "64-significand-bit x87 register accumulation then binary32 store",
+      "different_bytes": 7,
+      "different_seeds": 5,
+      "sky_441_pair": {"candidate": [200, 200], "observed": [200, 199]},
+      "sky_067_last_mip_B": {"candidate": 50, "observed": 51}
+    },
+    "fpu_control_word": "0x37f",
+    "catalog_expanded": false,
+    "independent_normalized_scalars_per_build": 163840,
+    "independent_intermediate_float_scalars_per_build": 116,
+    "independent_final_bytes_per_build": 116,
+    "independent_arithmetic": "integer rational nearest-even with 24/64 significand bits"
+  },
+  "fileinfo_metadata": {
+    "evidence_directory": "../icexiv-data-evidence/volume-writer-05",
+    "evidence_manifest_sha256": "5ca0fa93fbcf355fe5482916547ff0ae0d56e272e95e96223cc89b30ade3a2a9",
+    "sealed_files": 14,
+    "sealed_bytes": 22193,
+    "archive_validation_sha256": "794bfabcfc3edb547185813cc7d71ae7284302db04327333d69e003108e1e878",
+    "reports": [
+      {"file": "prefix-observation.json", "sha256": "99441ec50bed7420bdfa519ee9e3aec8e383aaec135e6a0b8ca9404a0a8010a7"},
+      {"file": "reader-entry.json", "sha256": "e1c57f164ecc9c208635602466b7cbec55630dde0db50ae2dc0c27f88f2ecff4"},
+      {"file": "record-verification.json", "sha256": "129d53df03304b04dd6765e49bd29e8c9ea760cd8b66eccbf8d968b48dcf5711"},
+      {"file": "archive-validation.json", "sha256": "794bfabcfc3edb547185813cc7d71ae7284302db04327333d69e003108e1e878"}
+    ],
+    "captured_bytes": 1120,
+    "named_records": 1,
+    "record_name": "nvngx_dlss.dll",
+    "size_and_sha1_match": true,
+    "native_exact_filename_hits": 0,
+    "texture_writer_information_obtained": false
+  },
+  "production_generator_identified": false,
+  "prefix_writer_identified": false,
+  "missing_coordinates_exported": false,
+  "missing_logical_bytes": 603624,
+  "six_level_reconstruction_count": 0
+}

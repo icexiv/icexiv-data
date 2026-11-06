@@ -1,0 +1,8 @@
+{
+  "report_sha256": "8128839ff6308db8fb5a4a8db41f807ce25433c1d5308b0d46a290dcaee967f9",
+  "resource_sha256": "1554d92ddc14be5610eab20f6235a5f1b85b8440ada6fc0449475214f162c27c",
+  "matrices": 4215,
+  "singular": 0,
+  "compared_components": 50580,
+  "oracle_rows_sha256": "982f190fe5fd9b7da7a87ef29e0fa0f8f93575e91ad5b3c324cba3a04aa26ed0"
+}

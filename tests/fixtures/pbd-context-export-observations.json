@@ -1,0 +1,70 @@
+{
+  "schema": "pbd-context-export-static-v1",
+  "version": "2026.10.06.0000.0000",
+  "platform": "PE32+ AMD64",
+  "evidence_directory": "../icexiv-data-evidence/pbd-context-export-22",
+  "executable": {
+    "bytes": 51910400,
+    "sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+    "preferred_base": "0x140000000",
+    "executed_or_emulated": false
+  },
+  "window": {
+    "va": "0x1402f1ba0",
+    "bytes": 3590,
+    "sha256": "9f0eadb73084caefd8018dc48ccc15917fd40e73320f8f8ea4cb4bbad16b85e7"
+  },
+  "new_interval": {
+    "va": "0x1402f1d0a",
+    "end_va_exclusive": "0x1402f2926",
+    "bytes": 3100
+  },
+  "shared_budget": {
+    "prior_new_entries": 2,
+    "same_entry_extension_counted_conservatively": 1,
+    "cumulative_new_or_extended_entries": 3,
+    "entry_limit": 4,
+    "prior_unique_new_code_bytes": 1661,
+    "additional_unique_code_bytes": 3100,
+    "cumulative_unique_new_code_bytes": 4761,
+    "new_code_byte_limit": 8192,
+    "seed_unique_bytes": 1304,
+    "all_unique_code_bytes": 6065,
+    "cumulative_data_regions": 2,
+    "data_region_limit": 2,
+    "cumulative_data_bytes": 20,
+    "data_byte_limit": 256,
+    "new_data_regions": 0,
+    "new_reference_queries": 0,
+    "cumulative_reference_queries": 0,
+    "query_limit": 0
+  },
+  "independent_review": {
+    "file": "review/result.json",
+    "bytes": 2039532,
+    "sha256": "b7e11911a2aa1a11632da8f69e15b38bafe43779ed2991bddeaefba80ffa54f1",
+    "replay": "python3 -B review/verify.py"
+  },
+  "counts": {
+    "instructions": 830,
+    "direct_calls": 20,
+    "direct_branches": 51,
+    "rip_references": 19
+  },
+  "manual_path_findings": [
+    "0x1402f2923 copies all xmm6 lanes to xmm2 after the conditional helper; sequential export has common-source quaternion components.",
+    "Relating exported Q/T to their pre-call producers requires Win64 ABI preservation of XMM6..15 low 128 bits.",
+    "0x1402f2674 explicitly multiplies associated A scale.xyz by L68 local translation.xyz before the quaternion polynomial.",
+    "Quaternion preparation reads two uncaptured constants; neither their values nor exact normalization are established.",
+    "The three visible A-generation branches and subsequent B gate do not exhaust the whole function or external incoming edges.",
+    "A null resource pointer skips both PBD queries; the second query is reached only after a nonnull resource's first query returns null.",
+    "Copy-forward covers 104 of 112 bytes in each A/B record, excluding offsets 0x4c..0x4f and 0x6c..0x6f.",
+    "The returned TRS-shaped region has 40 observed bytes read; its total object size and decomposition semantics remain unknown.",
+    "Only A count checks are visible; B and the three stride-48 output arrays require separate capacity/alias contracts.",
+    "B takes prepared Q and T from A, with S from the conditional pose-output path; complete source/target/bind spaces remain unaccepted."
+  ],
+  "external_branch_targets": [
+    "0x1402f29a6", "0x1402f2a11", "0x1402f2c4e", "0x1402f2c72", "0x1402f2dca"
+  ],
+  "boundary": "Static byte/field identity and manually identified ordinary algebra; no target execution, emulation, numeric oracle or complete render-goal acceptance."
+}

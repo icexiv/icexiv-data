@@ -11,6 +11,7 @@
 //! binary P6 PPM with alpha composited over black, which keeps the command
 //! dependency-free; use the TEX API directly for RGBA output. Reads and decoded
 //! output are capped at 64 MiB. Requires a native platform.
+//! Array layers, cube faces and volume slices are stacked vertically in file order.
 
 #[cfg(not(target_arch = "wasm32"))]
 fn main() -> Result<(), Box<dyn std::error::Error>> {
@@ -50,7 +51,10 @@ async fn run() -> Result<(), Box<dyn std::error::Error>> {
     let bytes = sqpack.read(path).await?;
     let mip = Tex::parse(&bytes)?.mip(0)?;
     let rgba = mip.decode_rgba8(64 * 1024 * 1024)?;
-    let (width, height) = (usize::from(mip.width()), usize::from(mip.height()));
+    let (width, height) = (
+        usize::from(mip.width()),
+        usize::from(mip.height()) * mip.image_count(),
+    );
     let mut out = Vec::with_capacity(width * height * 3);
     for pixel in rgba.chunks_exact(4) {
         for channel in &pixel[..3] {

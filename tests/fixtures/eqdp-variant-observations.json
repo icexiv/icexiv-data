@@ -1,0 +1,14 @@
+{
+  "version":"2026.10.06.0000.0000","platform":"Win32",
+  "links_sha256":"5985e9ed5c60860505e9504d9370b791ee2fd52453453e9a764d3f6952b7c71a",
+  "samples":[
+    {"path":"chara/xls/charadb/accessorydeformerparameter/c0101.eqdp","sha256":"eb8ee107e432d4800ad22cca6c22272a4136c8acae84275cb7c803469619f85b","rows_sha256":"6dca9bc943772332b54cdab34c8f460508be62e9e3ab5109dddbbd221a710c4e"},
+    {"path":"chara/xls/charadb/accessorydeformerparameter/c0201.eqdp","sha256":"ed0b95b986eb2052231922d39f5632cc8309650ab04d89546bd77a52f29713c1","rows_sha256":"c636ce3644d570a049675c8b3d1b1126c2da7831749f28a90841190e7fdb8262"},
+    {"path":"chara/xls/charadb/accessorydeformerparameter/c0401.eqdp","sha256":"806ef435d1ced1a9e50988e1af905ff15b5164b3d3c2f1208d3e5eca99372871","rows_sha256":"5490e65a5d818bc6a4598a6bc324df6afa605f3bca69a73c6912bd76574e937d"},
+    {"path":"chara/xls/charadb/accessorydeformerparameter/c0801.eqdp","sha256":"878e657225b3d70405b57ac95827e44942e86eef78a0f1101543e8ffa1c7f15e","rows_sha256":"41ee92804782025d62a46c17c8ef5eaace841830c75788265313517d0114917e"},
+    {"path":"chara/xls/charadb/accessorydeformerparameter/c1701.eqdp","sha256":"1f4f360434a2841111f54d8b14f8289fff1c2cd36cf2c4c708691d334dbc1fbe","rows_sha256":"55a80d07a6833740d6315dbc7233c320f10ad5563426a3752450dbd866d904c5"},
+    {"path":"chara/xls/charadb/accessorydeformerparameter/c1801.eqdp","sha256":"8c1187eafd46f4ee9d6483fbe797f4b6aa5e50bbf62175cda97a1b3e93793436","rows_sha256":"8d8025311ce56724498398c3581b49ec2e856e865373c884a973cfe19a07be08"},
+    {"path":"chara/xls/charadb/equipmentdeformerparameter/c1701.eqdp","sha256":"0fe829f80735d68c657dfd631bc609d3ac1424acfea0c0257fabf28f539e71d9","rows_sha256":"88a197976eae6b59f77da80fa70a11baf2e1f06a3fe7af26455520ab243806cf"},
+    {"path":"chara/xls/charadb/equipmentdeformerparameter/c1801.eqdp","sha256":"f40efc92a4ee0fd1cd6efda1b3b36a4199511a2554297ee49a637d318be15778","rows_sha256":"f3db6d95993b104561d3d368d4faf434dc1f364f021f1ade34b36a245ed4711f"}
+  ]
+}

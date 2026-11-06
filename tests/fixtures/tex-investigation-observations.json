@@ -1,0 +1,9 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "inventory_sha256": "4ed440f13f6435805a9ea7711428d6bddc1b9b0dcd938f0dec621680d129a8f6",
+  "samples": [
+    {"label":"volume-depth24","dat":"ffxiv/010000.win32.dat1","offset":967239424,"header_sha256":"1a5710f52fcc76bd4899b6dacd78ca585b228c77fbd223ea16b7151f31e585f5","expected_issue":"group-output-size-gap","groups_sha256":"c27ba04a35a913b892bb98f38f14485039d89a752cef9132f68684f3e8e786e5"},
+    {"label":"volume-depth32","dat":"ffxiv/010000.win32.dat0","offset":1609282304,"header_sha256":"5eeeea0c34e67d744fdec94cd12941d3257868fbf446265131badba017a589f3","expected_issue":"group-output-size-gap","groups_sha256":"b67473402d6fc95bf7668d4baca3ad164acd1499c8d09900adc68c0971bd70de"},
+    {"label":"bc6h-cube","dat":"ex5/020505.win32.dat0","offset":94043776,"header_sha256":"706229fe916c4489f89633c2376da956b318233aa4de7b675f3db71526e34dd8","expected_issue":"zero-only-bc6h-sample","groups_sha256":"242bcdd2d931bb618a4f123a2b48aa1558f584baad88bea72bc7e69393280a70"}
+  ]
+}

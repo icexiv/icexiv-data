@@ -1,0 +1,67 @@
+{
+  "schema": "mdl-scalar-compatibility-18-v1",
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32 AMD64",
+  "evidence_directory": "../icexiv-data-evidence/mdl-scalar-compatibility-18",
+  "archive": {
+    "manifest": "manifest.json",
+    "sha256": "55192d6fee77934da2cbb215750bf7c712465a64ea1538e92b33cc4a8e4f8212",
+    "files": 102,
+    "total_bytes": 18566082
+  },
+  "binary_sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "historical_range_fixture": "client-vertex-input-observations.json",
+  "ranges": [
+    {"label":"declaration_conversion","rva":"0x3207e0","bytes":648,"sha256":"224cd6d8b274a6d74221e0bd2cbe06a9831da6680e934db9819c2f070ff24fb9"},
+    {"label":"input_descriptors","rva":"0x21c480","bytes":720,"sha256":"21d439789b440a05d1ff08e4f0188bfb7ed0060f6a823d091846a6a378900a31"},
+    {"label":"declaration_forward","rva":"0x2261f0","bytes":9,"sha256":"81d5814fbfdddf46ee6e4779001dd14adde9ce086be30452644775690b81998c"},
+    {"label":"declaration_cache","rva":"0x236000","bytes":672,"sha256":"d31ab9664fa33884729002ce88ac5c9de4004cfabd138f3361f02b2f3665789c"}
+  ],
+  "mapping": [
+    {"raw_type":0,"internal_type":17,"dxgi_value":41,"format":"R32_FLOAT","components":1,"bytes":4},
+    {"raw_type":1,"internal_type":18,"dxgi_value":16,"format":"R32G32_FLOAT","components":2,"bytes":8},
+    {"raw_type":2,"internal_type":19,"dxgi_value":6,"format":"R32G32B32_FLOAT","components":3,"bytes":12},
+    {"raw_type":3,"internal_type":20,"dxgi_value":2,"format":"R32G32B32A32_FLOAT","components":4,"bytes":16}
+  ],
+  "specification": {
+    "repository": "MicrosoftDocs/sdk-api",
+    "commit": "656e9656bfaef34dd29cd7ee9e1146aec17e924c",
+    "path": "sdk-api-src/content/dxgiformat/ne-dxgiformat-dxgi_format.md",
+    "license": "CC BY 4.0",
+    "bytes": 62498,
+    "sha256": "610417406ea9acf0c1c33fc4d35209cb20eb534e41d93c86c0e038a584888566"
+  },
+  "static_review": {
+    "path": "review/result.json",
+    "bytes": 206365,
+    "sha256": "c6a2be0c0d55ab661eb8d81622649688e5c529700e92f90ae3d03e71554a5587",
+    "captured_selector_bytes": 60,
+    "guarded_selector_bytes": 67,
+    "incoming_reference_queries": 0,
+    "supplemental_callees": 2,
+    "supplemental_callee_bytes": 681,
+    "supplemental_data_bytes": 0
+  },
+  "numerical": {
+    "path": "numerical/result.json",
+    "bytes": 5348,
+    "sha256": "5286351aec6a288577a9faf5f85c57b5714a01a4c0c24a96104674746e1a7d1c",
+    "controlled_cases": 8,
+    "vertices_per_case": 2007,
+    "patterns_per_type": 2048,
+    "query_rows": 48192,
+    "output_bytes_per_side": 2189672,
+    "actual_sample_sha256": "66be81af7fbbd368b14052cde9dedcd047efdf12f87e5f522672a10ac9b4b425",
+    "actual_sample_bytes": 170940,
+    "actual_geometry_vertices": 3826,
+    "actual_geometry_indices": 8328,
+    "actual_query_rows": 18072,
+    "actual_type0_or_type1_samples": 0
+  },
+  "limits": [
+    "Selected raw types only; incomplete selector tail and unreviewed helpers do not establish every branch or runtime COM identity.",
+    "Fixed recapture verifies old range bytes, not the missing historical report.",
+    "Controlled MDLs are not game-produced scalar-type witnesses; type 0/1/3 production samples remain unverified.",
+    "Bit-preserving CPU output does not establish shader execution or GPU handling of nonfinite values."
+  ]
+}

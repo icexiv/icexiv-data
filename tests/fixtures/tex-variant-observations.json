@@ -1,0 +1,8 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "samples": [
+    {"index":"ffxiv/010000.win32.index","ordinal":42721,"hash":"8b59fc130137d8e2","dat":"ffxiv/010000.win32.dat0","offset":122583040,"header_sha256":"ef8d5dee29b4940ba89c39bb010040d7b75999fe3e80407fa259b3f3007b85e0","sha256":"193786c177590b4c3cd0fc19d1e5c7adfe0a7858e7d460d20b90aa807492dbf6","rows_sha256":"2ab1423b9c77a433035766fb10877724bde89ff83f65e908b4cd10fd7a830bf4"},
+    {"index":"ffxiv/000000.win32.index","ordinal":41,"hash":"0686c56e6ccc6646","dat":"ffxiv/000000.win32.dat0","offset":23561344,"header_sha256":"c60e6febb8ec7eecac60000f11c095cfcd1d4ba6f645d50673b24f395f5772fd","sha256":"6d9517e3c6bf1db9d55c0dd4900f7d706f35a320319eea046d8bf52ec5a90426","rows_sha256":"5191eea7975d5f6a8ff8aa281b6ceee014267056dfbb587f58e22d03b7844369"}
+  ]
+}

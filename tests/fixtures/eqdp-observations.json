@@ -1,0 +1,8 @@
+{
+  "version":"2026.10.06.0000.0000",
+  "platform":"Win32",
+  "samples":[
+    {"path":"chara/xls/charadb/equipmentdeformerparameter/c0101.eqdp","sha256":"0a747a180ec5209e367af430c66fa71bc1f7599a940e24f80a869fa9e9dc74c8","rows_sha256":"e1ed3a03e9736aa38bad56d16684cdb90e29074a40e2a32f58cefddd2c392b12"},
+    {"path":"chara/xls/charadb/equipmentdeformerparameter/c0201.eqdp","sha256":"83609b07d73e2a09e19e5c5a5e03489c150d7a0654905f254795cbff981dce34","rows_sha256":"5f8c5e471a01ca700f1b9ed5f62fa957c3b8e74db741160eee61b2540feafbeb"}
+  ]
+}

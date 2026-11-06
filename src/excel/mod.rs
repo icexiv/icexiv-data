@@ -29,8 +29,8 @@
 //! before allocation/access. String references are checked when read, within the
 //! containing parent row, and returned without their terminating NUL. They are
 //! not automatically decoded as UTF-8 or interpreted as SeString expressions.
-//! Metadata allocation is bounded by validated input-table lengths, not a
-//! separate policy limit; bound input sizes in the caller when data is untrusted.
+//! `parse_with_limits` bounds input, metadata allocation, row/column counts and
+//! validation work. Lazy string decoding retains the page's string-length cap.
 
 pub mod exd;
 pub mod exh;
@@ -45,6 +45,7 @@ use std::io::Cursor;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Error {
     InvalidData(&'static str),
+    BudgetExceeded(&'static str),
     UnsupportedVersion { format: &'static str, version: u16 },
     UnsupportedVariant(u8),
     UnsupportedColumnType(u16),
@@ -60,6 +61,7 @@ impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
             Self::InvalidData(reason) => write!(f, "invalid Excel data: {reason}"),
+            Self::BudgetExceeded(reason) => write!(f, "Excel {reason} budget exceeded"),
             Self::UnsupportedVersion { format, version } => {
                 write!(f, "unsupported {format} version {version}")
             }
@@ -84,6 +86,56 @@ impl fmt::Display for Error {
 impl std::error::Error for Error {}
 
 type Result<T> = std::result::Result<T, Error>;
+
+#[derive(Clone, Copy, Debug)]
+pub struct Limits {
+    pub max_input_bytes: usize,
+    pub max_metadata_bytes: usize,
+    pub max_columns: usize,
+    pub max_parent_rows: usize,
+    pub max_rows: usize,
+    pub max_string_bytes: usize,
+    pub max_work: usize,
+}
+impl Default for Limits {
+    fn default() -> Self {
+        Self {
+            max_input_bytes: 64 << 20,
+            max_metadata_bytes: 64 << 20,
+            max_columns: 65536,
+            max_parent_rows: 1_000_000,
+            max_rows: 2_000_000,
+            max_string_bytes: 1 << 20,
+            max_work: 32_000_000,
+        }
+    }
+}
+pub(crate) fn spend(budget: &mut usize, n: usize, name: &'static str) -> Result<()> {
+    *budget = budget.checked_sub(n).ok_or(Error::BudgetExceeded(name))?;
+    Ok(())
+}
+pub(crate) fn reserve<T>(count: usize, budget: &mut usize) -> Result<Vec<T>> {
+    spend(
+        budget,
+        count
+            .checked_mul(std::mem::size_of::<T>())
+            .ok_or(Error::InvalidData("metadata allocation overflow"))?,
+        "metadata",
+    )?;
+    let mut v = Vec::new();
+    v.try_reserve_exact(count)
+        .map_err(|_| Error::AllocationFailed)?;
+    Ok(v)
+}
+pub(crate) fn sort_work(count: usize) -> Result<usize> {
+    if count < 2 {
+        return Ok(0);
+    }
+    let levels = usize::BITS as usize - (count - 1).leading_zeros() as usize;
+    count
+        .checked_mul(levels)
+        .ok_or(Error::InvalidData("sorting work overflow"))
+}
 
 fn read<T>(bytes: &[u8], endian: Endian) -> Result<T>
 where

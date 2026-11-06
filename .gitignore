@@ -5,3 +5,4 @@
 /result-*
 /.reference/
 /legacy/
+/tools/__pycache__/

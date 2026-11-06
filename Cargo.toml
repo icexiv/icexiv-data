@@ -12,6 +12,7 @@ local = ["dep:tokio"]
 web = ["dep:reqwest", "dep:futures-util"]
 
 [dependencies]
+bcdec_rs = "=0.2.0"
 binrw = { version = "0.15", default-features = false, features = ["std"] }
 crc32fast = "1"
 flate2 = { version = "1", default-features = false, features = ["rust_backend"] }
@@ -39,4 +40,16 @@ required-features = ["local"]
 
 [[example]]
 name = "extract_texture"
+required-features = ["local"]
+
+[[example]]
+name = "validate_imc"
+required-features = ["local"]
+
+[[example]]
+name = "extract_entry"
+required-features = ["local"]
+
+[[example]]
+name = "validate_index2"
 required-features = ["local"]

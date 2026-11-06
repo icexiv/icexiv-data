@@ -1,0 +1,90 @@
+{
+  "kind":"volume-device-outputs-wrapper-assignment-and-conditional-tls",
+  "version":"2026.10.06.0000.0000",
+  "platform":"Windows AMD64 PE32+; preferred image base 0x140000000",
+  "binary_bytes":51910400,
+  "binary_sha256":"958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "directory":"../icexiv-data-evidence/volume-context-origin-15",
+  "manifest_sha256":"91f79e1a6ce9676c22ed26ed88e108e3fc8523734301c65e8ae97da0c2d6b689",
+  "sealed_files":82,
+  "sealed_bytes":7445074,
+  "reports":[
+    {"file":"SCOPE.md","sha256":"91ebf35eea579430636da2bcf60851f1e0ec5b5e63787ce3a6b8b10fdc87def2"},
+    {"file":"REPORT.md","sha256":"3d5e9db67b9df6d7b3fadc8b937ad9133019d2bec282da8a17749b9e65fb0a73"},
+    {"file":"CORRECTIONS.md","sha256":"1790908ae90fd4d54d3a9583c06421108277b0621c42a87a6776900929a0b81b"},
+    {"file":"SOURCES.md","sha256":"fec2ada486ee067141f6980414ed29f28e85fe67f0a54e2d425bd53f7d9847bc"},
+    {"file":"VERIFICATION.md","sha256":"ade9f03c73afab306920dec645e5d5ebc10d7aa48ebb8476d1be5075a994ca37"},
+    {"file":"semantic-model.json","sha256":"9db2a7b461c1c1cf5985d1c899278f8a38574ff847e1d7ffb01da45a212fcf8e"},
+    {"file":"verify_context.py","sha256":"08185bf6cdfe23177700ad6c5c9e305fbaca7b4c6a4db93a371395d9303547d1"},
+    {"file":"context-validation.json","sha256":"67444b074fd40e292f5740dd7502162d888b5c565e1e92e8c4901b52392bb689"},
+    {"file":"guard-validation.json","sha256":"d494307164224733aa9e8c0a26a8c143c10cb62a36054e22c5ca9cdaacd8c6fd"},
+    {"file":"device-refs.json","sha256":"4791e80673aca529707f9d619302773c9015c0ed551b64a4385fefc387309356"},
+    {"file":"thunk-refs.json","sha256":"3d4c3e4ab6861f96b0a7ac20641c77d416d3acf6470bbcc11233474ed9972990"},
+    {"file":"owner-refs.json","sha256":"b88f8d415a8185168039daad252bc55db420e039906c36a315319612099811fa"},
+    {"file":"specs/sources.json","sha256":"d59c5609a4b2974410ea87841599c67fc61c4a161a682ad85d017123bc1a04b9"},
+    {"file":"verify_independent_readonly.py","sha256":"12f5fbb8385fe373ee681fca096cd410eae649611ca042ec284d447ce635535c"},
+    {"file":"independent-replay.json","sha256":"ae5abd0f327b8a9785ad8d03fa8e1a440472549d7775936d1283bb153223e4d6"},
+    {"file":"readonly-replay-guards.json","sha256":"815762a553319ea1c19bb96fe801e7facdefa6e765b76856f2d921e9b10a3d4f"},
+    {"file":"review/REVIEW.md","sha256":"60eede89ac33f5bbf9263799fc55cbb926fd76a2ea31eac72fb0502a6de276a6"},
+    {"file":"review/verify_review.py","sha256":"ea5fcbaf9d3fba7f6bb1c53b70d9a1e255c4ce90076c82fb8016158f89fd8778"},
+    {"file":"review/review-validation.json","sha256":"a540b780b3ab75c68a15d63addb6bddea91c012956cee25bff95496de3f11f32"},
+    {"file":"review/RUNS.md","sha256":"486f4076c32f4b068206b6e7d9fd6548624833d39756c6d45865a55aa3a4c03b"},
+    {"file":"review/SHA256SUMS","sha256":"64a1b1a0d8134dfb43988d322c362e6a07c5379022405d72fa6ced6ff33714c2"}
+  ],
+  "main_verification":{
+    "full_result_bytes":518963,
+    "full_object_equal":true,"full_byte_equal":true,"excluded_result_fields":[],
+    "independent_semantic_review":false,
+    "counts":{
+      "function_roots":5,"pdata_pieces":7,"function_bytes":9844,"code_windows":1,
+      "code_entries_or_windows":6,"captured_code_bytes":9850,"unique_code_capture_bytes":9850,
+      "original_decode_rows":2141,"remaining_code_entries":2,"remaining_code_bytes":6534,
+      "query_count":3,"retained_candidates":3,"confirmed_direct_calls":2,"confirmed_import_jumps":1,
+      "semantic_intervals":25,"instruction_checks":34,"contract_pages":2,"contract_intervals":3,
+      "source_files":178,"parent_sealed_files":95,"parent_result_bytes":629303
+    }
+  },
+  "independent_selected_review":{
+    "status":"pass-for-declared-static-checks-with-qualified-and-unknown-semantics",
+    "full_result_bytes":855119,"full_object_equal":true,"full_byte_equal":true,
+    "excluded_result_fields":[],"own_pe_reader":true,
+    "entries":6,"code_pieces":8,"code_bytes":9850,"inherited_selected_bytes":6140,
+    "semantic_anchor_count":170,"source_snapshots":59,"objdump_full_stdout_matches":8,
+    "strict_json_invalid_cases_rejected":9,
+    "readonly_replay":"verify_independent_readonly.py",
+    "original_review_main_writes_run_logs":true,
+    "review_manifest_files":14,
+    "main_result_not_read_or_written_by_reviewer":true,
+    "qualified_or_unknown":[
+      "wrapper_successful_lifetime","owner_equals_global","interface_lifetime_between_reads",
+      "thread_field_initialization","tls_module_index_is_zero","tls_array_index_is_zero",
+      "registered_count_within_constructed_capacity","owner_queue_prepare_label",
+      "first_block_remaining_slots_lane30_to_lane0","type11_api_interpretation"
+    ]
+  },
+  "query_targets":["0x14210bda8","0x141794043","0x140220a60"],
+  "confirmed_calls":["0x140220e95","0x14022354b"],
+  "confirmed_import_jump":"0x141794043",
+  "queries_rescanned":false,
+  "creation_outputs":{"device":"owner+0xe0aa8","feature_level_u32":"owner+0xe0a90","immediate_context":"owner+0xe0ab0"},
+  "tls_registration":"old u32 count i from lock xadd; store A+i*0x2f78 only if i<unsigned capacity; neither index is proven zero",
+  "wrapper_assignment":"[owner+0xe0ac0]=W; [W+0x17b8]=[[0x1428f6780]+0xe0ab0]; owner/global identity unresolved",
+  "api_contract":{"author":"Microsoft","repository":"MicrosoftDocs/sdk-api","commit":"656e9656bfaef34dd29cd7ee9e1146aec17e924c","license":"CC BY 4.0","unmodified_pages":2},
+  "qualifications":[
+    "140240bef is the PSSetSamplers consumption anchor, not the device creation call",
+    "owner-queue-prepare is an inaccurate capture label; the body processes dimension/mode state",
+    "The whole-QWORD command+0x48 and +0x30 conditions must not be reduced to low32-bit tests",
+    "Conditional registration is not all-thread/runtime registration or a proof that collector count is within capacity",
+    "The slot+0x170 ABI alone does not bind COM identity, object lifetime or actual execution",
+    "Historical14 unknown flags remain unchanged; new15 evidence has separately qualified scope"
+  ],
+  "limits":{
+    "target_executed":false,"owner_global_identity_bound":false,
+    "tls_registration_instruction_bound":true,"tls_all_threads_or_runtime_bound":false,
+    "wrapper_install_instruction_bound":true,"global_context_assignment_instruction_bound":true,
+    "creation_to_consumption_com_identity_bound":false,"lane_first_block_ready_bound":false,
+    "lane30_to_lane0_bound":false,"publisher_to_consumer_complete":false,
+    "complete_base_read_count":273,"six_level_reconstruction_count":0,"missing_logical_bytes":603624,
+    "accepted_missing_bytes":0,"mip_generator_identified":false,"tex_prefix_writer_identified":false
+  }
+}

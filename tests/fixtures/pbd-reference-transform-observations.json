@@ -1,0 +1,60 @@
+{
+  "schema": "pbd-reference-transform-static-v1",
+  "version": "2026.10.06.0000.0000",
+  "platform": "PE32+ AMD64",
+  "evidence_directory": "../icexiv-data-evidence/pbd-reference-transform-21",
+  "executable": {
+    "bytes": 51910400,
+    "sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+    "preferred_base": "0x140000000",
+    "executed_or_emulated": false
+  },
+  "code_windows": [
+    {"name": "seed/reference_pose_seed_setup", "va": "0x1402f1ba0", "bytes": 362, "sha256": "9b31d30c28f83aa9c0264b9467623c10bc95e5b59d5cfa1d3317947cf4f8a8e5"},
+    {"name": "seed/reference_pose_copy", "va": "0x141efe510", "bytes": 143, "sha256": "75e20caa3fdaac3bbdba84c8cf5ac278c9999ea4976d3b912f34281d2d8b7551"},
+    {"name": "seed/pose_parent_accumulation", "va": "0x141efd960", "bytes": 438, "sha256": "263f393ef4e9d03bf6d0d9b112a843e3af1c78ac7b03f4de17dc8beed4a13630"},
+    {"name": "seed/record_trs_export", "va": "0x1402f2926", "bytes": 128, "sha256": "08c38fd9e1a9db2441d3bd74f44263b9e6fb5d59d65281296b30ade7be2dc08f"},
+    {"name": "seed/record_matrix_build", "va": "0x1402f8a20", "bytes": 233, "sha256": "8b82044df940832834e37108cc9cad029d7c0bd2e4ad54453978f4375d5d597e"},
+    {"name": "native/141efd6b0/body", "va": "0x141efd6b0", "bytes": 27, "sha256": "588719d487c491934614e58f2134cc33bfcf384cb8781929afbfc9e2b40a1586"},
+    {"name": "native/141efd6b0/complete", "va": "0x141efd6b0", "bytes": 688, "sha256": "d990491192bd5b6ae16f04175015b955a2e79af3a6d090027ddc76d0e72f6aa2"},
+    {"name": "native/14033b4c0/body", "va": "0x14033b4c0", "bytes": 973, "sha256": "9f63fccf8ce7e76adedb28b2916ab7fa761813c91850379cbfacbd2d42d10167"}
+  ],
+  "data_regions": [
+    {"name": "data/1428e2300", "va": "0x1428e2300", "bytes": 16, "sha256": "1dc5c8e021c663cd8f7ecf1fb0c6d4112bc8d7f3c9e0095cd26bd7af7b8d7f13"},
+    {"name": "data/14211bc38", "va": "0x14211bc38", "bytes": 4, "sha256": "e00e5eb9444182f352323374ef4e08ebcb784725fdd4fd612d7730540b3e0c8c"}
+  ],
+  "budget": {
+    "seed_bytes": 1304,
+    "new_entries": 2,
+    "new_entry_limit": 4,
+    "unique_new_code_bytes": 1661,
+    "new_code_byte_limit": 8192,
+    "same_entry_additional_unique_bytes": 661,
+    "data_regions": 2,
+    "data_region_limit": 2,
+    "data_bytes": 20,
+    "data_byte_limit": 256,
+    "reference_queries": 0,
+    "query_budget": 0
+  },
+  "independent_review": {
+    "file": "review/result.json",
+    "bytes": 501322,
+    "sha256": "fca14e5081dd44c85985149c3bcacde814b4722345b2840a7569ebc1f7143920",
+    "replay": "python3 -B review/verify.py",
+    "comparison": "Complete object and canonical bytes; full raw/asm comparison; manual algebra separately identified"
+  },
+  "boundaries": [
+    "referencePose and parentIndices names inherit earlier reflection evidence; not revalidated in this capture.",
+    "Skip requires pose+0x39 to remain nonzero; zero-fill and other writes may invalidate this under destructive aliasing.",
+    "Parent indices are sign-extended except root 0xffff; valid indices, ready parent outputs and non-destructive aliasing are prerequisites.",
+    "Parent translation has no explicit parent-scale multiply in the selected path; other context may still perform scale correction.",
+    "Hamilton q_parent*q_local and component scale multiply are ordinary algebra recognitions, not native binary32 execution results.",
+    "Under a column-vector convention and unit quaternion, twelve matrix components identify [R(q)diag(s) | t].",
+    "Four W slots lack initialization/computation in the selected builder/helper; no homogeneous 0,0,0,1 row is established.",
+    "For non-unit q, parent translation polynomial A(q) and matrix-helper R(q) differ by 2*(norm(q)^2-1)*I.",
+    "Export quaternion is entry xmm6.xyz plus entry xmm2.w; common producer identity is not established.",
+    "Main interval 0x1402f1d0a..0x1402f2926 has 3100 uncaptured bytes; output pointer is reloaded before matrix construction.",
+    "Complete source/target/bind spaces, cache aliases, EPBD selection, actual draw and the whole render goal remain unaccepted."
+  ]
+}

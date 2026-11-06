@@ -291,7 +291,7 @@ fn every_truncated_prefix_is_rejected() {
 #[test]
 fn unsupported_formats_and_layouts_are_not_guessed() {
     let original = texture(Format::L8, 1, 1, &[&[0]]);
-    for id in [0, 0x1452, 0x6330, u32::MAX] {
+    for id in [0, 0x1452, u32::MAX] {
         let mut bytes = original.clone();
         put32(&mut bytes, 4, id);
         assert_eq!(
@@ -299,14 +299,7 @@ fn unsupported_formats_and_layouts_are_not_guessed() {
             Error::UnsupportedFormat(id)
         );
     }
-    for attributes in [
-        0,
-        0x0040_0000,
-        0x0100_0000,
-        0x0200_0000,
-        0x1000_0000,
-        0x0480_0000,
-    ] {
+    for attributes in [0, 0x0040_0000, 0x0480_0000] {
         let mut bytes = original.clone();
         put32(&mut bytes, 0, attributes);
         assert_eq!(
@@ -419,6 +412,19 @@ fn bc5_decodes_red_and_green_blocks_with_a_full_alpha() {
         pixels(&decode(Format::Bc5, 1, 1, &block)),
         [[0, 255, 0, 255]]
     );
+}
+#[test]
+fn bc5_interpolation_modes_and_selectors_are_independent_per_channel() {
+    // Matches the generic Pillow DDS CPU oracle; see BC4/BC5 provenance.
+    let indices = std::array::from_fn(|i| (i % 8) as u8);
+    let mut block = bc4_block(10, 200, &indices);
+    block.extend_from_slice(&bc4_block(200, 10, &indices.map(|i| 7 - i)));
+    let red = [10, 200, 48, 86, 124, 162, 0, 255];
+    let green = [37, 64, 91, 118, 145, 172, 10, 200];
+    let expected: Vec<_> = (0..16)
+        .map(|i| [red[i % 8], green[i % 8], 0, 255])
+        .collect();
+    assert_eq!(pixels(&decode(Format::Bc5, 4, 4, &block)), expected);
 }
 
 #[test]

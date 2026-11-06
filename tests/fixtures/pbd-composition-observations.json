@@ -1,0 +1,7 @@
+{
+  "resource_sha256": "1554d92ddc14be5610eab20f6235a5f1b85b8440ada6fc0449475214f162c27c",
+  "pairs": 4215,
+  "noncommuting_pairs": 3801,
+  "compared_components": 139095,
+  "oracle_rows_sha256": "1c0ffae35840c827d1a4c38282946d3ed610251a9e8275e2a4521d130482ab78"
+}

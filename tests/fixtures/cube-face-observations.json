@@ -1,0 +1,9 @@
+{
+  "report_sha256": "4be072887e13152966fc703f94b0956600d8448250e871147381e8b6a2b6ffe2",
+  "faces_verified": 60,
+  "face_names": ["PositiveX", "NegativeX", "PositiveY", "NegativeY", "PositiveZ", "NegativeZ"],
+  "win32_docs_commit": "51c9b7cc54ef393b6406c8320a7840fdd88209d5",
+  "sdk_api_docs_commit": "656e9656bfaef34dd29cd7ee9e1146aec17e924c",
+  "face_enum_document_sha256": "7338b5ca95f931daa911a63d29c8202d50a0f04b7a95356838404f625ed90b06",
+  "subresource_document_sha256": "1636edfbdee1d012c605b816a46f53ed8a28893cabbacfbdcfa54244a71ff0d3"
+}

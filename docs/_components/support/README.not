@@ -1,0 +1,23 @@
+= 格式支持目录组件
+
+`lib.notc` 的 `catalog(source: String)` 接收 JSON 分组数组，输出可筛选的
+双列卡片。窄屏自动单列；每张卡片通过原生 details 展开限制，状态同时以
+文字和颜色表达。颜色继承书籍主题变量，内容在 Shadow DOM 内隔离。
+
+分组包含 title 和 items；条目包含 name、status、route、summary、limit。
+status 为 ready、partial 或 reference；route 是书籍根目录下的单级页面
+路径，例如 `tex/`。组件使用宿主 rel=home 定位根目录，没有外部依赖。
+JSON 文本以 textContent 输出，不解释 HTML。数据变化和组件重连会重新渲染。
+
+## 验证
+
+构建书籍后执行浏览器回归：
+
+```sh
+nix develop -c notist build
+node docs/_components/support/tests/browser.cjs
+```
+
+需要可用的 Playwright 和 Chromium。`NOTIST_PLAYWRIGHT` 可指定模块路径，
+`NOTIST_CHROMIUM` 可指定浏览器，`NOTIST_SCREENSHOTS` 可指定截图目录。
+测试用请求拦截读取构建产物，不启动 HTTP 服务器，不访问外部网络。

@@ -1,0 +1,17 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "provenance": "docs/provenance/mdl.md",
+  "samples": [
+    {"sha256":"66be81af7fbbd368b14052cde9dedcd047efdf12f87e5f522672a10ac9b4b425","rows_sha256":"2a53da42630755cfee7cfe4c8e8ec18017d4bca393cd1bba628e689e255867b2","meshes":3,"vertices":3826,"indices":8328,"shape_values":0},
+    {"sha256":"961c5b587b4ed5dd2c51d9ec57764b8761c4a0af57cf2202bb2247db9d47e26d","rows_sha256":"655e4b2cee8b15a7f5a3167c1fee352edbe066dfd6f063e79622a38dec1395d3","meshes":6,"vertices":1867,"indices":7095,"shape_values":0},
+    {"sha256":"09ee35287ae0ea7f07719ed4c7d09491d9a6309edb78352a6ea21bdd48450f89","rows_sha256":"48e085c6cd621719057b219f50f9f0c016af7eaae336276bd4511b8930139063","meshes":11,"vertices":12700,"indices":20376,"shape_values":32833},
+    {"sha256":"6491e675a2a14533e5c87e605d679e578394b14f6d71a2ca929794d1956e7104","rows_sha256":"a155a17b829e5f015120877d2874dffb5229c4a5688077c8051c1779a16dd84a","meshes":6,"vertices":5078,"indices":13653,"shape_values":619},
+    {"sha256":"1a2d0e1225ac707571de85368dbb83a02312619f5a4b534aa01169aef4900c47","rows_sha256":"f1fd7e78c67767f7f0757ba646112421c90a01fa3afa555ab77eb6435e7d46d9","meshes":3,"vertices":2503,"indices":5172,"shape_values":557},
+    {"sha256":"d03d30dc521eb87e05ef359c87595e31e543b928b7e45a96d18fd49e493455fe","rows_sha256":"d69d3587b64a31af4093c5ef29508b7ef722aff64211389e1ce4dc807d9b6ec0","meshes":5,"vertices":3113,"indices":6717,"shape_values":0},
+    {"sha256":"d1911e9921162343eba9f36c5e2148fb10784dab3009af9f01d6d1e7738499a3","rows_sha256":"9181c356f023aeb11459562ad4b070748f4fa5dd30ea338b22dc22e52320e274","meshes":3,"vertices":3369,"indices":6849,"shape_values":0},
+    {"sha256":"71d0b8ebbfe74b52d4e0aa14efceeeeefc3788ab5b4b0cb02be34ec0b64838d2","rows_sha256":"c024478933044fd1d2e853ec24c736ffd34c0efc7675216e73d2b06e93d0d4c5","meshes":2,"vertices":7,"indices":9,"shape_values":0},
+    {"sha256":"0272099d73ae3ea2a83dced49a5f02f2f6d2fd4ee19a926df32460a2e8861a84","rows_sha256":"ef46d83760b30821c46584f6fe347847dc7459f86c0b5bd5555a69768d7ac534","meshes":30,"vertices":16524,"indices":35307,"shape_values":0},
+    {"sha256":"752b2ff411212b827a96184ad8ca923f257798d81468083f99203e985242f17b","rows_sha256":"d29efd0d5bcd680ab57e7af030f3326a7d9ced928364c35a134c537b4221dfe2","meshes":9,"vertices":12610,"indices":31980,"shape_values":0}
+  ]
+}

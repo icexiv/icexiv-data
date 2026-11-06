@@ -1,0 +1,11 @@
+{
+  "pillow": "12.2.0",
+  "report_sha256": "17486a260f7b3f495b7988022da5cf04295b05d8510c40eda4a524ef5c92165b",
+  "endpoint_pairs_per_channel": 65536,
+  "pixels": 2097152,
+  "images": 2,
+  "endpoint_gt_per_channel": 32640,
+  "endpoint_le_per_channel": 32896,
+  "equal_endpoints_per_channel": 256,
+  "occurrences_per_selector_per_channel": 131072
+}

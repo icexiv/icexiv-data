@@ -1,0 +1,17 @@
+{
+  "version":"2026.10.06.0000.0000",
+  "platform":"Win32",
+  "samples":[{
+    "path":"chara/human/c0101/animation/a0001/bt_common/resident/idle.pap",
+    "sha256":"96c29c780bad9d7cbccc2fe012ca2b1b34a950ca91df3e8b7180bc7dc1695d37",
+    "bytes":33541,
+    "sampled_coefficients":45980,
+    "rust_rows_sha256":"ee54dd8c0681c83c59039f5d7c53bcb099e5f5a6b9ff81f24986ec0bef0a5763",
+    "tagfile_offset":106,
+    "tagfile_end":33184,
+    "classes":32,
+    "objects":6,
+    "animation_object_ids":[6,4],
+    "binding_object_ids":[5,3]
+  }]
+}

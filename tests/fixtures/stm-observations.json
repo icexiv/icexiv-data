@@ -1,0 +1,16 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "samples": [
+    {"path":"chara/base_material/stainingtemplate.stm","layout":"Legacy","sha256":"c0210e02a1f6851f3d3fcba9c61efbb153d2086cb512b48afac3d3615f4f721e","rows_sha256":"f32207c33f1d1444cee493e33e2f93a2c2fca9a4ff1f4e1d2dc8114132886dc5"},
+    {"path":"chara/base_material/stainingtemplate_gud.stm","layout":"Dawntrail","sha256":"81648516a871c694b4c4883898a195b00971f0041e3bb8d9fdfb65f511d69a94","rows_sha256":"c29ebbb7480c718643b2b3ae16d1ab0a665d3927d19aa02152ed906432ba04fa"}
+  ],
+  "controlled_samples": [
+    {"layout":"Legacy","sha256":"a9550dc9ea9c4457900af3da49454139f710fc1a736caa646263970aa9c18f2e","rows_sha256":"d027666fd868bda0e885bf577048d2e4d8ae80bb792c4baf730fc0eb304b25a5"},
+    {"layout":"Dawntrail","sha256":"63e862368297d628ea4294872cf6a86c1ddc4ebd2105d668525c9da2bd1bfeea","rows_sha256":"6022f0dae59c50e6145c6b62461643bd96f968d89e4c6a1bc6c05568bd780f6f"}
+  ],
+  "stain_sheet": {
+    "exh_sha256":"3652e14c6e8cc6a8c85a6417094e30bcd270403e40804456f630ed419b3a3cf2",
+    "exd_sha256":"6ceb3caa99df48c3fe022d1db1aab441dddf9d12fb0a917ae7f778c2439c4031"
+  }
+}

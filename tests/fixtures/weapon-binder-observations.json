@@ -1,0 +1,13 @@
+{
+  "version":"2026.10.06.0000.0000","platform":"Win32",
+  "results":[
+    {"mdl_sha256":"7f89a54ce68710cda419fc66fc66f1f3218d8c8fcb259c7fd5298a590b413942","sklb_sha256":"db3e7a3539e8504fe40adad67b457930bd3e4dbb37fed4b82257bf85a184ddc2","rows_sha256":"dffeb48847f5423738de02901101bcdeeda848b732e7d708f35ccddbb4a3392f"},
+    {"mdl_sha256":"18c12444e08e56a52d46e0edafc346e37f20f96cbca98a404a8a14fe7039c90b","sklb_sha256":"db3e7a3539e8504fe40adad67b457930bd3e4dbb37fed4b82257bf85a184ddc2","rows_sha256":"0af565c5fceb04acaccb2b65ed87b6d420018a9b4261cc8c3aed722aef705657"},
+    {"mdl_sha256":"725d166544307e7950670e228b814cee18d774aee8fe7e8040c02bece263ecc5","sklb_sha256":"db3e7a3539e8504fe40adad67b457930bd3e4dbb37fed4b82257bf85a184ddc2","rows_sha256":"70c834993f9f71740ca4e4235bc93749855ffb811a0d069cb03036ba5dd1c6a3"}
+  ],
+  "samples":[
+    {"weapon":101,"body":11,"vfx_id":1,"imc_path":"chara/weapon/w0101/obj/body/b0011/b0011.imc","imc_sha256":"ec2fb7109f1fd3ef1664ece70b03ffc6655182e506fb0d99bf1545c00304ba36","avfx_path":"chara/weapon/w0101/obj/body/b0011/vfx/eff/vw0001.avfx","avfx_sha256":"719aa04ecbaee4cddd332bf95695e455c82c9d86e678f576c01e632cda1b24f0","mdl_path":"chara/weapon/w0101/obj/body/b0011/model/w0101b0011.mdl","sklb_path":"chara/weapon/w0101/skeleton/base/b0001/skl_w0101b0001.sklb"},
+    {"weapon":101,"body":19,"vfx_id":2,"imc_path":"chara/weapon/w0101/obj/body/b0019/b0019.imc","imc_sha256":"268c3609df772c1b447cc1c2a1d0fc154261f20e4d6670f5b84bc3158f29c98f","avfx_path":"chara/weapon/w0101/obj/body/b0019/vfx/eff/vw0002.avfx","avfx_sha256":"ad367067cec1731e43de9d5305bd6153e26a5dfb771474f1b67427ba5938c73d","mdl_path":"chara/weapon/w0101/obj/body/b0019/model/w0101b0019.mdl","sklb_path":"chara/weapon/w0101/skeleton/base/b0001/skl_w0101b0001.sklb"},
+    {"weapon":101,"body":21,"vfx_id":2,"imc_path":"chara/weapon/w0101/obj/body/b0021/b0021.imc","imc_sha256":"9d79c1f3703f0c3684b7c0c538559ee9b852c65e38e0f90049b6d318df6158f5","avfx_path":"chara/weapon/w0101/obj/body/b0021/vfx/eff/vw0002.avfx","avfx_sha256":"24a10544394f5f97da2d41a9e1142a1aa508d41eab37597625115a709496ce5f","mdl_path":"chara/weapon/w0101/obj/body/b0021/model/w0101b0021.mdl","sklb_path":"chara/weapon/w0101/skeleton/base/b0001/skl_w0101b0001.sklb"}
+  ]
+}

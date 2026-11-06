@@ -1,0 +1,38 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "binary_bytes": 51910400,
+  "binary_sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "report_sha256": "81face99b1b458eb641d8b95c29aa1cd9e15c0b60848c075d8f490a1eb011f79",
+  "ranges": [
+    {"label":"inline_gate","rva":"0x42aca0","bytes":114,"sha256":"4d2bc325f6e033d98bec7461ddbeb57e7f0703d1e893e2fe5c7afaff41dacde7"},
+    {"label":"declaration_and_conversion","rva":"0x42adf9","bytes":966,"sha256":"d805e7243cfe158d499abb15c64ef5ced7e3c34f594894e1f6d05c12df6d99c0"},
+    {"label":"modern_copy_and_dye_gates","rva":"0x42b430","bytes":533,"sha256":"84dff15a998fddcf1e14caa363f02b0dd3c499c61cfaf30de5230cbdfd58991b"},
+    {"label":"upload_arguments","rva":"0x42b645","bytes":147,"sha256":"c19ff855557c92c3e97c4b53ec94e4665e76d3ebc39abceba2b7db9ebb0352c3"},
+    {"label":"float_to_half","rva":"0x240220","bytes":189,"sha256":"bd5dddf9e540402b11c3ed993e92a98a52b87cc753d4ffb7309e072f85b49441"},
+    {"label":"half_to_float","rva":"0x240840","bytes":134,"sha256":"28ae44ce7e16991c410fb6b55488ab7bc8d035fd36f644c45bcbf85b4f1e2f66"},
+    {"label":"byte_fill_large_paths","rva":"0x1da6130","bytes":292,"sha256":"d00bad212879580f441c749101deb3aa1e43a7b36a6142dcf0bbca8518df5f31"}
+  ],
+  "calls": [
+    {"rva":"0x42aea2","target":"0x1da6150"},
+    {"rva":"0x42af12","target":"0x240220"},
+    {"rva":"0x42af26","target":"0x240220"},
+    {"rva":"0x42af3f","target":"0x240840"},
+    {"rva":"0x42af50","target":"0x240220"},
+    {"rva":"0x42af7f","target":"0x240220"},
+    {"rva":"0x42afae","target":"0x240220"},
+    {"rva":"0x42afc2","target":"0x240220"},
+    {"rva":"0x42afd6","target":"0x240220"},
+    {"rva":"0x42afea","target":"0x240220"},
+    {"rva":"0x42b007","target":"0x240220"},
+    {"rva":"0x42b01b","target":"0x240220"},
+    {"rva":"0x42b59b","target":"0x42b730"},
+    {"rva":"0x42b62e","target":"0x42b730"},
+    {"rva":"0x42b6d3","target":"0x216dc0"}
+  ],
+  "constants": [
+    {"load_rva":"0x42aec8","load_prefix":"f30f1035","value_rva":"0x211bc38","f32_le_hex":"0000803f"},
+    {"load_rva":"0x42aede","load_prefix":"f30f103d","value_rva":"0x211bbd8","f32_le_hex":"0000003f"}
+  ],
+  "copied_lane_pairs": [[0,0],[1,1],[2,2],[8,8],[9,9],[10,10],[4,12],[5,13],[7,14],[11,25],[12,28],[13,29],[14,30],[15,31]],
+  "limitations": "The lane pairs describe a manually traced native branch, not a complete converter or a runtime-output oracle. Static region hashes pin the instructions reviewed. Quantization comparisons are independent mathematical hypotheses."
+}

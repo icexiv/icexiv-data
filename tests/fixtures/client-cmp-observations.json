@@ -1,0 +1,32 @@
+{
+  "binary_sha256":"958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "ranges":[
+    {"label":"cmp_load","rva":"0x426893","bytes":50,"sha256":"dd1d843c971b225967f6e577c9544a36ee0ccf3055eb24cbbc37d63479faa134"},
+    {"label":"tail_range","rva":"0x46d490","bytes":224,"sha256":"b70be776526914ffd2f1b7a231622d6c10294b8c6505f2a183e2f84145d5e830"},
+    {"label":"height_range","rva":"0x46d5c0","bytes":231,"sha256":"6e640230d565da23285bbb86becb67534b8ed8582eeaf9c0f026880d1dbe2465"},
+    {"label":"bust_range","rva":"0x46d180","bytes":317,"sha256":"df8dffe77e6aa85a2458aac7dd334ad0f4214b56aea73cc1d3f135fd94945d00"},
+    {"label":"parameter_consumer","rva":"0x445fa0","bytes":274,"sha256":"c9c4576cf802e691dcb86835ae6fb54bb5e3a3ee90c8db80ba43dcec51e6dff6"}
+  ],
+  "anchors":[
+    {"rva":"0x4268be","hex":"48898340020000","meaning":"CMP request result at utility +0x240"},
+    {"rva":"0x46d4f7","hex":"498d8fb70c0000","meaning":"male tail base index 0xcb7, times 56 = 0x2c808"},
+    {"rva":"0x46d51c","hex":"480518c80200","meaning":"female tail file base 0x2c818"},
+    {"rva":"0x46d537","hex":"4c6bc138","meaning":"tail record stride 56"},
+    {"rva":"0x46d635","hex":"480500c80200","meaning":"male height file base 0x2c800"},
+    {"rva":"0x46d657","hex":"480510c80200","meaning":"female height file base 0x2c810"},
+    {"rva":"0x46d66d","hex":"486bd238","meaning":"height record stride 56"},
+    {"rva":"0x46d607","hex":"81fbff0000007432","meaning":"height input 255 branches to unit scalar"},
+    {"rva":"0x46d1b7","hex":"837c245864","meaning":"bust input percentage threshold 100"},
+    {"rva":"0x46d4b6","hex":"837c246864","meaning":"tail input percentage threshold 100"},
+    {"rva":"0x46d602","hex":"83fb64760a","meaning":"height input percentage threshold 100"},
+    {"rva":"0x46d231","hex":"f3420f10840020c80200","meaning":"bust min X: 0x2c820"},
+    {"rva":"0x46d245","hex":"f3420f109c0024c80200","meaning":"bust min Y: 0x2c824"},
+    {"rva":"0x46d23b","hex":"f3420f10a40028c80200","meaning":"bust min Z: 0x2c828"},
+    {"rva":"0x46d24f","hex":"f3420f108c002cc80200","meaning":"bust max X: 0x2c82c"},
+    {"rva":"0x46d259","hex":"f3420f10940030c80200","meaning":"bust max Y: 0x2c830"},
+    {"rva":"0x46d277","hex":"f3420f10840034c80200","meaning":"bust max Z: 0x2c834"},
+    {"rva":"0x211bcd8","hex":"0000c842","meaning":"f32 divisor 100"},
+    {"rva":"0x211bc38","hex":"0000803f","meaning":"f32 unit scalar"},
+    {"rva":"0x28a6488","hex":"0000803f0000803f0000803f","meaning":"bust male/default vector (1,1,1)"}
+  ]
+}

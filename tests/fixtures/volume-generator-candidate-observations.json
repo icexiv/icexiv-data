@@ -1,0 +1,41 @@
+{
+  "kind": "documented-api-candidate-and-identity-pinned-witnesses",
+  "version": "2026.10.06.0000.0000",
+  "executable_sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "evidence_directory": "../icexiv-data-evidence/volume-generator-01",
+  "reports": [
+    {
+      "file": "sources.json",
+      "sha256": "1d191f2b4f99103cc54074599768f3de1b26710e0875ecf2a027d0191af72e25"
+    },
+    {
+      "file": "witnesses.json",
+      "sha256": "05bc5c11712e1dc4efa01b7dff2aeef815df8903fa42b96dacdb3fb1276e8503"
+    },
+    {
+      "file": "witness-checks.json",
+      "sha256": "30feb27c020b591b9526c1dc36ba0b7c79902f80617f72dbcffe07142ca8066f"
+    }
+  ],
+  "documentation": {
+    "repository": "MicrosoftDocs/win32",
+    "commit": "51c9b7cc54ef393b6406c8320a7840fdd88209d5",
+    "license": "CC BY 4.0",
+    "volume_load_default_filter": "TRIANGLE | DITHER",
+    "ordered_dither_dimensions": [4, 4],
+    "filter_texture_default": "BOX for power-of-two; BOX | DITHER otherwise",
+    "filter_texture_recursive": true,
+    "filter_volume_texture_is_macro_alias": true,
+    "exact_numeric_execution_specified": false
+  },
+  "witnesses": ["sky_441", "sky_067", "sky_104", "sky_358"],
+  "dat_read_bytes": 7104,
+  "index_reads": 0,
+  "counterexamples_reproduced": ["same-neighborhood-different-output", "off-threshold-mismatch"],
+  "temporary_research_directories_available": false,
+  "full_273_entry_evidence_set_recovered": false,
+  "production_generator_identified": false,
+  "production_rule_established": false,
+  "six_level_reconstructed_short_entries": 0,
+  "provenance": "docs/provenance/volume-generation.md"
+}

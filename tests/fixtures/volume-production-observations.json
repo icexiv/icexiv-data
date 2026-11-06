@@ -1,0 +1,86 @@
+{
+  "kind": "sky-authoring-base-arrangement-and-static-consumer-evidence",
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32 resources and Win64 executable; 2019 publication images have separate identity",
+  "binary_sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "input_catalog_sha256": "7ec7eaad3536f75c3bd78d3976920ee1f01a18bfd84ccc11ebfcd2c31413a20b",
+  "evidence_directory": "../icexiv-data-evidence/volume-production-06",
+  "evidence_manifest_sha256": "fd3520f565d9cf7eeca042d91f0e20908fa5b0eba3e7684ec9ebc2988f17f089",
+  "sealed_files": 355,
+  "sealed_bytes": 6536190,
+  "archive_validation_sha256": "3df54c8e84c24c91b70186a5c676e35c538f3d498da084515bfa43e5942be557",
+  "reports": [
+    {"file": "REPORT.md", "sha256": "a7b05e418ee99de42a8676652ae399c5847ff9e23885210072d445d5caf05fad"},
+    {"file": "SOURCES.md", "sha256": "ddb136b96785340b4bd49e72702d5a2687dc68ceec689327a620a91c925ecc13"},
+    {"file": "base-period.json", "sha256": "383fa9baf4ec119e7a291a22300d97fbffd1d0e5e462b3993bbca28d836048e7"},
+    {"file": "independent-review/base-verification.json", "sha256": "b5eec14190d2409ac2f825477c58a13d50c55386d41f6fe63b3923cf1822f234"},
+    {"file": "independent-review/REVIEW.md", "sha256": "678e8fcd04b7ef04a605f68c89e6d0b0bce8c803f85a402b60a8f30c242dc72b"},
+    {"file": "native-review/verified/review.json", "sha256": "760da7c86cd422cf447175292fba966261119a411fbe05abd396327479de280d"},
+    {"file": "shaders/observation/report.json", "sha256": "3eeff661d9bff3866160ee774108d7f0d075781441d81d26c2bae528293f7073"},
+    {"file": "shader-review/independent.json", "sha256": "9c96c12d4174064f40b29becdefb74daf5b9a10540f6784fb1daaa3b3d2308ff"},
+    {"file": "shader-review/comparison.json", "sha256": "d1d55e544fd9813803b517544885a10fae738c7b425ac9d933f0c9bb537d5b3e"},
+    {"file": "shader-review/REVIEW.md", "sha256": "1bb33b5cba7ef7831a7f427be79cd7a1390f4ce931a75a19102a35f50b16c653"}
+  ],
+  "independent_manifests": [
+    {"file": "independent-review/SHA256SUMS", "sha256": "92cbc165939dd64501379d14cca5a2537bc450b0dc324a527256ddeef9ca297b"},
+    {"file": "native-review/SHA256SUMS", "sha256": "edb0b6e47e2eb4913f6eb058bb36f5f0c2502d15c854856317cc7bccb2704a73"},
+    {"file": "shader-review/SHA256SUMS", "sha256": "435349b6dd49c55f173cb0e282a5ca8e107e6ee234bfc675329a866ed8d114d1"}
+  ],
+  "authoring_observation": {
+    "publication_date": "2019-03-25",
+    "public_pages": 9,
+    "linked_original_images": 4,
+    "sky_image_sha256": "ab1332b6f5745886182e952300dbf881a42d9c48845a2c2a1cb1a2f0d9a9bb5b",
+    "psd_titles_top_to_bottom": ["sky_076.psd", "sky_023.psd", "sky_064.psd", "sky_067.psd"],
+    "visible_rgb8_windows_one_based": [1, 3, 4],
+    "second_window_mode": "layer mask /8",
+    "visually_different_from_2026_same_name": ["sky_064"],
+    "exact_psd_dimensions_established": false,
+    "cross_version_byte_identity_established": false
+  },
+  "base_observation": {
+    "independently_inflated_entries": 452,
+    "depth32_entries_compared": 147,
+    "depth24_identity_only": 126,
+    "depth2_identity_only": 179,
+    "comparison": "All BGRA bytes of slices z=0..7 equal z+24 in each depth32 base",
+    "slice_pairs": 1176,
+    "bytes_compared": 1204224,
+    "different_bytes": 0,
+    "minimum_period_established": false
+  },
+  "native_observation": {
+    "raw_spans_independently_checked": 20,
+    "instruction_anchors": 102,
+    "input_divisor_f32_bits": "0x47a8c000",
+    "operations": ["t=divss(u,86400)", "h=divss(0.5,D)", "p=mulss(N,t)", "q=divss(p,D)", "w=addss(q,h)"],
+    "parameter_block": "cSkyParam",
+    "parameter_bytes": 96,
+    "coordinate_byte_offsets": [64, 68],
+    "second_texture_compaction_swaps_table_ids": false,
+    "runtime_mxcsr_established": false,
+    "runtime_input_range_established": false
+  },
+  "shader_observation": {
+    "profile": "ps_5_0",
+    "constant_buffer_slot": 2,
+    "constant_buffer_float4_count": 6,
+    "token_resource_dimension": 5,
+    "rdef_resource_dimension_raw": 8,
+    "reviewed_chunks": 10,
+    "reviewed_instructions": 74,
+    "reviewed_operands": 171,
+    "sampling_sites": [
+      {"file": "Sky.shcd", "sha256": "3a6150c72bb530c28255b1632e81c5767801cd9eb939e633e2e41d8dbe14cbda", "mov_offset": "0x64c", "sample_offset": "0x664", "source": "cb2[4].x", "texture_slot": 0},
+      {"file": "Sky2.shcd", "sha256": "74a0fe4ab0411620a6c2fece0935f24cbeb27c45a775e9afd0757a3369617b02", "mov_offset": "0x6ec", "sample_offset": "0x704", "source": "cb2[4].y", "texture_slot": 1},
+      {"file": "Sky2.shcd", "sha256": "74a0fe4ab0411620a6c2fece0935f24cbeb27c45a775e9afd0757a3369617b02", "mov_offset": "0x750", "sample_offset": "0x768", "source": "cb2[4].x", "texture_slot": 0}
+    ],
+    "intervening_instructions": 0,
+    "gpu_execution": false
+  },
+  "production_generator_identified": false,
+  "prefix_writer_identified": false,
+  "missing_logical_bytes": 603624,
+  "six_level_reconstruction_count": 0,
+  "short_resources": 273
+}

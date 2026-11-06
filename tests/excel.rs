@@ -56,7 +56,7 @@ fn exd(rows: &[(u32, u16, &[u8])]) -> Vec<u8> {
         bytes.extend_from_slice(&count.to_be_bytes());
         bytes.extend_from_slice(payload);
     }
-    // Some documentation calls this data-section length, others reserve it.
+    // EXD data-section length excludes the 32-byte header and row index.
     let data_size = bytes.len() - 32 - index_size;
     put32(&mut bytes, 12, data_size as u32);
     bytes
@@ -234,10 +234,10 @@ fn default_strings_support_offsets_aliases_empty_and_raw_payloads() {
 fn subrows() -> Vec<u8> {
     let mut payload = vec![0; 16];
     put16(&mut payload, 0, 7);
-    put32(&mut payload, 2, 8); // relative to first subrow's fixed-data end
+    put32(&mut payload, 2, 0); // relative to the shared parent string pool
     put16(&mut payload, 6, 100);
     put16(&mut payload, 8, 42);
-    put32(&mut payload, 10, 6); // relative to second subrow's fixed-data end
+    put32(&mut payload, 10, 6); // same shared string-pool origin
     put16(&mut payload, 14, 200);
     payload.extend_from_slice(b"alpha\0beta\0");
     payload
@@ -397,7 +397,7 @@ fn malformed_row_indexes_and_payload_lengths_never_become_absence() {
 }
 
 #[test]
-fn strings_cannot_escape_their_parent_row_or_target_peer_fixed_data() {
+fn strings_use_the_shared_pool_and_cannot_escape_their_parent_row() {
     let hdr = header(4, 1, &[(0, 0)]);
     let bytes = exd(&[(1, 1, &[0, 0, 0, 0, b'a']), (2, 1, &[0; 5])]);
     let page = Exd::parse(&bytes, &hdr).unwrap();
@@ -411,7 +411,7 @@ fn strings_cannot_escape_their_parent_row_or_target_peer_fixed_data() {
     assert!(page.row(1).unwrap().unwrap().field(0).is_err());
     let hdr = header(6, 2, &[(0, 0), (5, 4)]);
     let mut payload = subrows();
-    put32(&mut payload, 2, 0);
+    put32(&mut payload, 2, u32::MAX);
     let bytes = exd(&[(88, 2, &payload)]);
     let page = Exd::parse(&bytes, &hdr).unwrap();
     assert!(page.subrow(88, 7).unwrap().unwrap().field(0).is_err());
@@ -419,6 +419,112 @@ fn strings_cannot_escape_their_parent_row_or_target_peer_fixed_data() {
         page.subrow(88, 42).unwrap().unwrap().field(0).unwrap(),
         Value::String(b"beta")
     );
+}
+
+#[test]
+fn excel_policy_limits_cover_metadata_counts_validation_and_lazy_strings() {
+    use icexiv_data::excel::Limits;
+    let bytes = exh(4, 1, &[(0, 0)], &[(0, 10)], &[0]);
+    for limits in [
+        Limits {
+            max_input_bytes: 0,
+            ..Limits::default()
+        },
+        Limits {
+            max_metadata_bytes: 0,
+            ..Limits::default()
+        },
+        Limits {
+            max_columns: 0,
+            ..Limits::default()
+        },
+        Limits {
+            max_work: 0,
+            ..Limits::default()
+        },
+    ] {
+        assert!(matches!(
+            Exh::parse_with_limits(&bytes, limits),
+            Err(Error::BudgetExceeded(_))
+        ));
+    }
+    let h = Exh::parse(&bytes).unwrap();
+    let b = exd(&[(1, 1, b"\0\0\0\0hello\0")]);
+    for limits in [
+        Limits {
+            max_input_bytes: 0,
+            ..Limits::default()
+        },
+        Limits {
+            max_metadata_bytes: 0,
+            ..Limits::default()
+        },
+        Limits {
+            max_parent_rows: 0,
+            ..Limits::default()
+        },
+        Limits {
+            max_rows: 0,
+            ..Limits::default()
+        },
+        Limits {
+            max_work: 0,
+            ..Limits::default()
+        },
+    ] {
+        assert!(matches!(
+            Exd::parse_with_limits(&b, &h, limits),
+            Err(Error::BudgetExceeded(_))
+        ));
+    }
+    let p = Exd::parse_with_limits(
+        &b,
+        &h,
+        Limits {
+            max_string_bytes: 4,
+            ..Limits::default()
+        },
+    )
+    .unwrap();
+    assert!(matches!(
+        p.row(1).unwrap().unwrap().field(0),
+        Err(Error::BudgetExceeded("string length"))
+    ));
+    let p = Exd::parse_with_limits(
+        &b,
+        &h,
+        Limits {
+            max_string_bytes: 5,
+            ..Limits::default()
+        },
+    )
+    .unwrap();
+    assert_eq!(
+        p.row(1).unwrap().unwrap().field(0).unwrap(),
+        Value::String(b"hello")
+    );
+    let mut wrong = b.clone();
+    put32(&mut wrong, 12, 0);
+    assert!(Exd::parse(&wrong, &h).is_err());
+    wrong = b.clone();
+    wrong.push(0);
+    assert!(Exd::parse(&wrong, &h).is_err());
+}
+
+#[test]
+fn first_and_later_subrows_alias_the_same_parent_string_pool() {
+    let h = header(6, 2, &[(0, 0), (5, 4)]);
+    let mut data = subrows();
+    put32(&mut data, 10, 0);
+    let b = exd(&[(88, 2, &data)]);
+    let p = Exd::parse(&b, &h).unwrap();
+    let a = p.subrow(88, 7).unwrap().unwrap().field(0).unwrap();
+    let c = p.subrow(88, 42).unwrap().unwrap().field(0).unwrap();
+    assert_eq!(a, Value::String(b"alpha"));
+    assert_eq!(a, c);
+    if let (Value::String(a), Value::String(c)) = (a, c) {
+        assert_eq!(a.as_ptr(), c.as_ptr());
+    }
 }
 
 #[test]

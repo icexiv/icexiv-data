@@ -207,14 +207,14 @@ pub(super) fn entry_header(bytes: &[u8], start: u64, file_size: u64) -> Result<E
     })
 }
 
-/// One level-of-detail record of a texture entry, relative to the entry body.
-#[allow(dead_code)]
+/// One texture data group, relative to the entry body. Groups may split a mip
+/// by array layer/cube face or combine multiple volume slices.
 pub(super) struct LodBlock {
     pub compressed_offset: u32,
-    /// Total stored span of this level, including alignment and padding.
+    /// Total stored span of this group, including alignment and padding.
     pub compressed_size: u32,
     pub decompressed_size: u32,
-    /// Observed as zero; meaning not established.
+    /// First block index in the u16 span table.
     pub block_offset: u32,
     pub block_count: u32,
 }

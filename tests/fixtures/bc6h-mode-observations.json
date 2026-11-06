@@ -1,0 +1,24 @@
+{
+  "modes": [
+    {"prefix":0,"blocks":256,"block_sha256":"c4922f1a4fd08413f5742628da459ba2fd275748c1f104fa6f01949dbdd290ff","rgba32f_sha256":"f75f282f854efff5568fd0a5782dbd3feb0a6ebeca4f8b5c1c165e3a52e8bb6f","negative_values":6359,"above_one_values":3103},
+    {"prefix":1,"blocks":256,"block_sha256":"733aefeeffba1a7c79c74ecc9f6e0164a36af2f776c1aa43dfaee528e2a5046e","rgba32f_sha256":"6dfaad1cb5707b831b962e9d260afecd64dec9e490b9f432a0674fd29256d9b6","negative_values":6063,"above_one_values":2671},
+    {"prefix":2,"blocks":256,"block_sha256":"818ae2e0438370379452502665599785997b5a6d866c0087462878f1e8ac3665","rgba32f_sha256":"e9c4360db193941c8b89b0279e548f32983419dc3c797166ced6ebceabd148b4","negative_values":6040,"above_one_values":3012},
+    {"prefix":6,"blocks":256,"block_sha256":"8ab25de8b95331c9d2f64b3fe4d9e40719804fe12e944a4c976df2e3e1d2187e","rgba32f_sha256":"ec685ec84530ebe06bfbe58ce7afe12abf5bf165e4ed4819e8e2849c691b84f8","negative_values":6031,"above_one_values":3201},
+    {"prefix":10,"blocks":256,"block_sha256":"45fde5f3f776f4ab3c884ad149b46c3478bbbe4e10c8b48f6d7cd32ff833376c","rgba32f_sha256":"cf49b030c928dab95b4abc4613a172cc8a5b6bef62e3cb1474c6609264caccf5","negative_values":6267,"above_one_values":2995},
+    {"prefix":14,"blocks":256,"block_sha256":"bc6bde22e31fbf32919e07c668bdc7f0978ecde89b767c622fbb8330ddfad7f3","rgba32f_sha256":"1c73c6a224d8d53fe84657fad15456bc05ccd58623ba027ab31a3eb1523400fe","negative_values":6268,"above_one_values":3050},
+    {"prefix":18,"blocks":256,"block_sha256":"2b1b8744152203521266cb6b04880d5a8c61437709e653227876afbe788ee8a5","rgba32f_sha256":"78f51dce65a4cf36e36b49628d075974b3b38c7751a4f9b44c50ad04a0a6cb71","negative_values":6327,"above_one_values":2911},
+    {"prefix":22,"blocks":256,"block_sha256":"cfb6d56a87dee3fa50c3585e428dcaf120013cd0fe6fa8bdbf368aa4ab902351","rgba32f_sha256":"027efed93af5a2fed1da72b87522c4a81a6bc1e4bf66911c91c2e1b4f02827a0","negative_values":6051,"above_one_values":3098},
+    {"prefix":26,"blocks":256,"block_sha256":"c8b935575f6194d2339331e867407affb3fc8cd062f4c4f8b98e0c0caeb3c367","rgba32f_sha256":"6f4123ea3f1f20fd74d59b1e827f8262c101427b3425c1a16f9d6a7dc0c8d5aa","negative_values":6020,"above_one_values":3068},
+    {"prefix":30,"blocks":256,"block_sha256":"fcc351753363084b1e2006cc21f414a686131978104041362ef7752e43e6bf20","rgba32f_sha256":"756da8aedf2ee054d6ada084fa9c7f9e091773498e4b35332fb38a9863b98983","negative_values":6277,"above_one_values":2386},
+    {"prefix":3,"blocks":256,"block_sha256":"68d0eb222d81818c14bc126a4bd3de977ec41016e5ed510a9270c201cd6b8192","rgba32f_sha256":"cac792e5b95eef3a18f7e6be42d74191d311c4b598630192b10dd930af6f02f9","negative_values":5918,"above_one_values":2254},
+    {"prefix":7,"blocks":256,"block_sha256":"49b0087c0c73c08f0bbe66a7538edc3da50918cff23ffccb0738362d3e85ab83","rgba32f_sha256":"84061c15fbefa2eca37df2e8a9860b38aa1e7488e9d4a100c768689c262f1b6f","negative_values":5949,"above_one_values":2847},
+    {"prefix":11,"blocks":256,"block_sha256":"647e7ee3bf9db7ed3a9886759c25cd7114f141a871a42778866f739db68fb150","rgba32f_sha256":"7ac0f117e515cb90e8c9b234707e69e837fa1ec1ecf3701cd7b66fc441e857a8","negative_values":6210,"above_one_values":3128},
+    {"prefix":15,"blocks":256,"block_sha256":"2825e79922cc0be069711e93dd51c8adcf4cb237a3ade37aaa4e7621ab8f6201","rgba32f_sha256":"869a171dde1d9790fadd4aac482594af9e7fef47487bf73dcb5e10549cfea3d8","negative_values":6349,"above_one_values":2912},
+    {"prefix":19,"blocks":256,"block_sha256":"20623214ce409ed9270038bec25904489f9cd0dac31e1e0ad9b24c1103408069","rgba32f_sha256":"49b4d9e4c5be5d006f048cced25f9ee7110fbea226a14d511ffac8320eb4d68e","negative_values":0,"above_one_values":0},
+    {"prefix":23,"blocks":256,"block_sha256":"6f5a34b6979a8ba7b2efcd59e3cfa587f3691e977cdd4e72ef347d4ed9a3307f","rgba32f_sha256":"49b4d9e4c5be5d006f048cced25f9ee7110fbea226a14d511ffac8320eb4d68e","negative_values":0,"above_one_values":0},
+    {"prefix":27,"blocks":256,"block_sha256":"d23b3329fa33878bfcce07cf45bab4b307ca48bb1242602e470c56a114d12ad3","rgba32f_sha256":"49b4d9e4c5be5d006f048cced25f9ee7110fbea226a14d511ffac8320eb4d68e","negative_values":0,"above_one_values":0},
+    {"prefix":31,"blocks":256,"block_sha256":"656689a88053e6103497475b9b1869d698109fc62cac508533dbfce70b9d7fba","rgba32f_sha256":"49b4d9e4c5be5d006f048cced25f9ee7110fbea226a14d511ffac8320eb4d68e","negative_values":0,"above_one_values":0}
+  ],
+  "total_blocks": 4608,
+  "float_components": 294912
+}

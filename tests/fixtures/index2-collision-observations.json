@@ -1,0 +1,10 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "report_sha256": "8eeba80d03b5d0bb8a09dbfe8cbcdddff6c603e4964e9e1301dfb403b159de22",
+  "paired_indexes": 59,
+  "primary_records": 1802972,
+  "flagged_hashes": 31,
+  "collision_name_records": 62,
+  "index2_only_locations": 0
+}

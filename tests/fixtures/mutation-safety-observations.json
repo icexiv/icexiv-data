@@ -1,0 +1,10 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "report_sha256": "22ba6281624194eb73831f5fa3d7c2aeff845bd750479f622ee7891537b48639",
+  "samples_sha256": "65b1e56c10b54b0d908f3f51fceec9c0369946d3428236909197056c51d3dbb9",
+  "samples": 29,
+  "attempts": 18123,
+  "parse_accepted": 11161,
+  "selected_followup_accepted": 5857,
+  "panics": 0
+}

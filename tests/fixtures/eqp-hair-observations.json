@@ -1,0 +1,10 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "report_sha256": "e5683941def7b49e2e36baa74e4164df40e9220fe85924272beb684eb90ac53f",
+  "eqp_sha256": "1c34fd6f0b707103a6664a6bbe018773a6d15f27c74ee583e6847080b9167343",
+  "rows_sha256": "e8e403f4b8c404081ba947d26b457713494df02d6dd190968acbc90f877ffaee",
+  "present_entries": 2879,
+  "hair_code_histogram": [2113, 452, 132, 123, 16, 7, 36, 0],
+  "controlled_bytes": 256
+}

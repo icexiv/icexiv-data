@@ -1,0 +1,10 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "report_sha256": "5f26337bea88be128519bf2dcfa7aa699e7a6923a09da229bfd2bd0331d61ce5",
+  "samples": [
+    {"index":"ffxiv/040000.win32.index","ordinal":6,"hash":"0001161d2015297e","dat":"ffxiv/040000.win32.dat2","offset":1069784320,"header_sha256":"32a198634f2ac896e3f2636ff9a9cf021fc354f9a6a71493010ac8379c0a153f","sha256":"9ae067706ffd3d1e599a3f946c1067f91dc4634f4fcb7356e271c52663284fa1","rows_sha256":"b49ef36b174e2ad112f93a283510d4c9769bcc5e640d7030916dddfe588cd5a3"},
+    {"index":"ffxiv/040000.win32.index","ordinal":10,"hash":"0001161d4ae9644f","dat":"ffxiv/040000.win32.dat6","offset":18444288,"header_sha256":"d8fcb424aa2ef0c5c567fe2b6a023d1bc0a3caf67d41f226ef932cb0aa5e41ab","sha256":"8c43f15a218afe84bed2d2b7777425dc0ec90321c230d7c25a83ec659a983a0f","rows_sha256":"b578ec1e6fb332c42f4a124b184eebdbf950b681bce5e37e97998de1ab353c40"},
+    {"index":"ffxiv/040000.win32.index","ordinal":258450,"hash":"c3a1eb7d2c17f30e","dat":"ffxiv/040000.win32.dat0","offset":6830208,"header_sha256":"35c316694e1c1baa930966208aae113599b8abc69e94074a955ff3fa01401e79","sha256":"aa4cd6c92dba351a91858686d9a269da7ecc38e450a16b5f2342d4e11f5d1dc0","rows_sha256":"a4ada14381e21be65aa3c5c47e703cd158584a65a8f691496e3f673e0113eb81"},
+    {"index":"ffxiv/040000.win32.index","ordinal":258453,"hash":"c3a1eb7d30a50327","dat":"ffxiv/040000.win32.dat0","offset":1584828032,"header_sha256":"35c316694e1c1baa930966208aae113599b8abc69e94074a955ff3fa01401e79","sha256":"7332493e40e65785aed7eb7245f5c65a7f325787f904c310c5112dd3ce06bbfc","rows_sha256":"818d82ea2efa7d2ee89b54319a3e58fd3916569f925fb4bfb867dc6270a94cc9"}
+  ]
+}

@@ -1,7 +1,9 @@
 //! Resource lookup orchestrates byte acquisition; format.rs owns binary parsing.
 
 use super::index::{self, Index, IndexHash, IndexKind};
-use super::{Error, PackReader, PackSource, SqPack, format, is_valid_file_name};
+use super::{
+    Error, PackReader, PackSource, SqPack, TextureGroup, format, is_valid_file_name, model, texture,
+};
 use std::sync::Arc;
 
 struct ResourcePath {
@@ -84,11 +86,26 @@ fn invalid<E>(file: &str, reason: &'static str) -> Error<E> {
 }
 
 impl<S: PackSource> SqPack<S> {
+    /// Extract an entry at an index-provided absolute offset in a DAT file.
+    /// `dat_name` is relative to the pack source, e.g. `ffxiv/010000.win32.dat0`.
+    /// This avoids requiring a reversible path hash when enumerating an index.
+    /// The same container, block and output-budget checks as `read` apply;
+    /// arbitrary offsets are not treated as confirmed missing resources.
+    pub async fn read_entry(
+        &self,
+        dat_name: &str,
+        offset: u64,
+    ) -> Result<Vec<u8>, Error<S::Error>> {
+        let dat = self.open(dat_name).await?;
+        self.extract(&dat, dat_name, offset).await
+    }
+
     /// Resolve an ASCII game resource path (case-insensitive) to extracted bytes.
     ///
-    /// Supports Win32 index/index2, type-2 standard entries and type-4 texture
-    /// entries, including raw and raw-DEFLATE blocks. Model and synonym/collision
-    /// entries are not supported yet and return errors, not absence or guessed bytes.
+    /// Supports Win32 index/index2 and type-2 standard, type-3 model and type-4
+    /// texture entries, including raw and raw-DEFLATE blocks. Index2 flagged
+    /// entries use the full path in the collision-name table; missing auxiliary
+    /// bytes, duplicate matching names and primary-index synonyms return errors.
     ///
     /// In the absence of a manifest or listing API, probes all 256 chunk names
     /// for the path's category/repository until found. Prefers index, using index2
@@ -96,6 +113,125 @@ impl<S: PackSource> SqPack<S> {
     /// 512 opens. Does not verify container SHA-1 checksums. Index tables are
     /// re-read on every call unless [`SqPack::with_index_cache`] is enabled.
     pub async fn read(&self, path: &str) -> Result<Vec<u8>, Error<S::Error>> {
+        let (name, offset) = self.locate(path).await?;
+        let dat = self.open(&name).await?;
+        self.extract(&dat, &name, offset).await
+    }
+
+    /// Resolve a resource and decode one type-4 group, preserving its raw prefix.
+    /// See [`Self::read_texture_group_entry`] for validation and budget scope.
+    pub async fn read_texture_group(
+        &self,
+        path: &str,
+        group: usize,
+    ) -> Result<TextureGroup, Error<S::Error>> {
+        let (name, offset) = self.locate(path).await?;
+        self.read_texture_group_entry(&name, offset, group).await
+    }
+
+    /// Decode a selected group from an index-provided type-4 entry location.
+    ///
+    /// Validates all group/span tables and their ordered, nonoverlapping physical
+    /// ranges; decodes only the selected group's blocks. The byte cap bounds the
+    /// prefix plus selected decoded bytes and each physical read, rather than the
+    /// full logical file size. Other groups' streams are not validated here.
+    /// No synthetic full TEX is returned. [`TextureGroup::volume_mip`] additionally
+    /// checks the complete selected mip for the one-group-per-mip volume profile.
+    pub async fn read_texture_group_entry(
+        &self,
+        dat_name: &str,
+        offset: u64,
+        group: usize,
+    ) -> Result<TextureGroup, Error<S::Error>> {
+        let dat = self.open(dat_name).await?;
+        let entry = self.load_entry_header(&dat, dat_name, offset).await?;
+        if entry.kind != 4 {
+            return Err(Error::UnsupportedContentType {
+                file: dat_name.to_owned(),
+                kind: entry.kind,
+            });
+        }
+        let table_bytes = dat.read_at(offset + 24, entry.table_size).await?;
+        let span_count =
+            texture::span_count(&table_bytes, &entry).map_err(|e| invalid(dat_name, e))?;
+        let spans = dat
+            .read_at(offset + 24 + entry.table_size as u64, span_count * 2)
+            .await?;
+        let table = texture::Table::parse(&table_bytes, &spans, &entry, dat.len())
+            .map_err(|e| invalid(dat_name, e))?;
+        if group >= table.len() {
+            return Err(Error::TextureGroupOutOfBounds {
+                index: group,
+                count: table.len(),
+            });
+        }
+        let level = table.group(group).map_err(|e| invalid(dat_name, e))?;
+        let reserve = level.decompressed_size as usize;
+        // Zero group length leaves its size to the block headers. Other groups'
+        // nonzero declarations still occupy part of the logical output budget.
+        let output_limit = if reserve == 0 {
+            table.undeclared_size
+        } else {
+            reserve
+        };
+        let check_budget = |size: usize| -> Result<(), Error<S::Error>> {
+            let requested = table
+                .prefix_size
+                .checked_add(size)
+                .ok_or(Error::RangeOverflow)?;
+            if let Some(limit) = self.max_read_bytes.filter(|&limit| requested > limit) {
+                return Err(Error::ReadTooLarge { requested, limit });
+            }
+            Ok(())
+        };
+        check_budget(reserve)?;
+        let prefix = dat.read_at(entry.body_offset, table.prefix_size).await?;
+        let mut data = Vec::new();
+        data.try_reserve_exact(reserve)
+            .map_err(|_| Error::AllocationFailed { requested: reserve })?;
+        let mut start = entry.body_offset + u64::from(level.compressed_offset);
+        for span in table.spans(&level) {
+            let bytes = dat.read_at(start, 16).await?;
+            let block = format::block_header(&bytes).map_err(|e| invalid(dat_name, e))?;
+            let total = data
+                .len()
+                .checked_add(block.output_size)
+                .ok_or(Error::RangeOverflow)?;
+            if total > output_limit {
+                return Err(invalid(
+                    dat_name,
+                    "texture group block exceeds declared output",
+                ));
+            }
+            check_budget(total)?;
+            let stored = block
+                .header_size
+                .checked_add(block.stored_size)
+                .ok_or(Error::RangeOverflow)?;
+            if stored > usize::from(span) {
+                return Err(invalid(dat_name, "texture block exceeds stored span"));
+            }
+            let bytes = dat.read_at(start, stored).await?;
+            let decoded = format::decode_block(&bytes, block.output_size)
+                .map_err(|e| invalid(dat_name, e))?;
+            data.try_reserve_exact(decoded.len())
+                .map_err(|_| Error::AllocationFailed { requested: total })?;
+            data.extend_from_slice(&decoded);
+            start += u64::from(span);
+        }
+        if reserve != 0 && data.len() != reserve {
+            return Err(invalid(dat_name, "texture group decoded size mismatch"));
+        }
+        Ok(TextureGroup {
+            prefix,
+            data,
+            index: group,
+            count: table.len(),
+            declared_file_size: entry.output_size,
+        })
+    }
+
+    async fn locate(&self, path: &str) -> Result<(String, u64), Error<S::Error>> {
         let path =
             ResourcePath::parse(path).ok_or_else(|| Error::InvalidResourcePath(path.to_owned()))?;
         for chunk in 0..=u8::MAX {
@@ -127,7 +263,7 @@ impl<S: PackSource> SqPack<S> {
             };
             let Some(location) =
                 index
-                    .find_entry(hash)
+                    .find_named(hash, path.path.as_bytes())
                     .map_err(|reason| Error::UnsupportedIndexEntry {
                         file: index_name.clone(),
                         reason,
@@ -136,8 +272,7 @@ impl<S: PackSource> SqPack<S> {
                 continue;
             };
             let dat_name = format!("{stem}.dat{}", location.dat);
-            let dat = self.open(&dat_name).await?;
-            return self.extract(&dat, &dat_name, location.offset).await;
+            return Ok((dat_name, location.offset));
         }
         Err(Error::MissingResource(path.path))
     }
@@ -162,6 +297,24 @@ impl<S: PackSource> SqPack<S> {
         name: &str,
         offset: u64,
     ) -> Result<Vec<u8>, Error<S::Error>> {
+        let entry = self.load_entry_header(dat, name, offset).await?;
+        match entry.kind {
+            2 => self.extract_standard(dat, name, offset, &entry).await,
+            3 => self.extract_model(dat, name, offset, &entry).await,
+            4 => self.extract_texture(dat, name, offset, &entry).await,
+            kind => Err(Error::UnsupportedContentType {
+                file: name.to_owned(),
+                kind,
+            }),
+        }
+    }
+
+    async fn load_entry_header(
+        &self,
+        dat: &PackReader<S::File>,
+        name: &str,
+        offset: u64,
+    ) -> Result<format::EntryHeader, Error<S::Error>> {
         let magic = dat.read_at(0, 8).await?;
         let data_start = if magic == b"SqPack\0\0" {
             let prefix = dat.read_at(0, 24).await?;
@@ -178,16 +331,7 @@ impl<S: PackSource> SqPack<S> {
             return Err(invalid(name, "resource entry overlaps container headers"));
         }
         let header = dat.read_at(offset, 24).await?;
-        let entry =
-            format::entry_header(&header, offset, dat.len()).map_err(|e| invalid(name, e))?;
-        match entry.kind {
-            2 => self.extract_standard(dat, name, offset, &entry).await,
-            4 => self.extract_texture(dat, name, offset, &entry).await,
-            kind => Err(Error::UnsupportedContentType {
-                file: name.to_owned(),
-                kind,
-            }),
-        }
+        format::entry_header(&header, offset, dat.len()).map_err(|e| invalid(name, e))
     }
 
     async fn extract_standard(
@@ -226,8 +370,98 @@ impl<S: PackSource> SqPack<S> {
         Ok(output)
     }
 
+    async fn extract_model(
+        &self,
+        dat: &PackReader<S::File>,
+        name: &str,
+        offset: u64,
+        entry: &format::EntryHeader,
+    ) -> Result<Vec<u8>, Error<S::Error>> {
+        if let Some(limit) = self
+            .max_read_bytes
+            .filter(|&limit| entry.output_size > limit)
+        {
+            return Err(Error::ReadTooLarge {
+                requested: entry.output_size,
+                limit,
+            });
+        }
+        if entry.header_size < model::PREFIX || entry.output_size < model::MDL_HEADER {
+            return Err(invalid(name, "model header or output too short"));
+        }
+        let prefix = dat.read_at(offset, model::PREFIX).await?;
+        let header = model::Header::parse(&prefix).map_err(|e| invalid(name, e))?;
+        let spans_size = header.span_count * 2;
+        if spans_size > entry.header_size - model::PREFIX {
+            return Err(invalid(name, "model block spans exceed entry header"));
+        }
+        let spans = dat
+            .read_at(offset + model::PREFIX as u64, spans_size)
+            .await?;
+        header
+            .validate_spans(&spans)
+            .map_err(|e| invalid(name, e))?;
+        // Validate every stored segment before allocating the logical output.
+        for segment in &header.segments {
+            if segment.blocks != 0 {
+                let start = entry
+                    .body_offset
+                    .checked_add(u64::from(segment.offset))
+                    .ok_or_else(|| invalid(name, "model segment offset overflow"))?;
+                format::check_span(start, u64::from(segment.stored_size), dat.len())
+                    .map_err(|e| invalid(name, e))?;
+            }
+        }
+        let mut output = Vec::new();
+        output
+            .try_reserve_exact(entry.output_size)
+            .map_err(|_| Error::AllocationFailed {
+                requested: entry.output_size,
+            })?;
+        output.resize(model::MDL_HEADER, 0);
+        let mut sizes = [0u32; 11];
+        for index in header.logical_order() {
+            let segment = &header.segments[index];
+            if segment.blocks == 0 {
+                continue;
+            }
+            let before = output.len();
+            let mut start = entry.body_offset + u64::from(segment.offset);
+            for block_index in segment.first_block..segment.first_block + segment.blocks {
+                let block_prefix = dat.read_at(start, 16).await?;
+                let block = format::block_header(&block_prefix).map_err(|e| invalid(name, e))?;
+                let occupied = block
+                    .header_size
+                    .checked_add(block.stored_size)
+                    .ok_or_else(|| invalid(name, "model block size overflow"))?;
+                let span = usize::from(u16::from_le_bytes([
+                    spans[block_index * 2],
+                    spans[block_index * 2 + 1],
+                ]));
+                if occupied > span || block.output_size > entry.output_size - output.len() {
+                    return Err(invalid(name, "model block exceeds span or output budget"));
+                }
+                let stored = dat.read_at(start, occupied).await?;
+                let decoded = format::decode_block(&stored, block.output_size)
+                    .map_err(|e| invalid(name, e))?;
+                output.extend_from_slice(&decoded);
+                start += span as u64;
+            }
+            let size = output.len() - before;
+            if size == 0 || size.div_ceil(128) as u64 * 128 != u64::from(segment.capacity) {
+                return Err(invalid(name, "decoded model segment capacity mismatch"));
+            }
+            sizes[index] =
+                u32::try_from(size).map_err(|_| invalid(name, "model segment size overflow"))?;
+        }
+        header
+            .write_mdl_header(&mut output, &sizes)
+            .map_err(|e| invalid(name, e))?;
+        Ok(output)
+    }
+
     /// Rebuild a texture entry's file: the prefix stored at the entry body (the
-    /// TEX header) followed by every level's decoded data blocks.
+    /// TEX header) followed by every group's decoded data blocks.
     async fn extract_texture(
         &self,
         dat: &PackReader<S::File>,
@@ -300,6 +534,16 @@ impl<S: PackSource> SqPack<S> {
         }
         let mut span = 0usize;
         for level in &levels {
+            if level.block_offset as usize != span {
+                return Err(invalid(name, "texture first block index mismatch"));
+            }
+            let group_span = spans[span..span + level.block_count as usize]
+                .iter()
+                .try_fold(0u64, |sum, &value| sum.checked_add(u64::from(value)))
+                .ok_or_else(|| invalid(name, "texture group span overflow"))?;
+            if group_span != u64::from(level.compressed_size) {
+                return Err(invalid(name, "texture group stored span mismatch"));
+            }
             if level.block_count == 0 {
                 return Err(invalid(name, "texture level has no data blocks"));
             }
@@ -308,6 +552,7 @@ impl<S: PackSource> SqPack<S> {
                 .checked_add(u64::from(level.compressed_offset))
                 .ok_or_else(|| invalid(name, "texture block offset overflow"))?;
             let mut decoded = 0usize;
+            format::check_span(start, group_span, dat.len()).map_err(|e| invalid(name, e))?;
             for _ in 0..level.block_count {
                 let header = dat.read_at(start, 16).await?;
                 let block = format::block_header(&header).map_err(|e| invalid(name, e))?;
@@ -318,6 +563,9 @@ impl<S: PackSource> SqPack<S> {
                     .header_size
                     .checked_add(block.stored_size)
                     .ok_or_else(|| invalid(name, "texture block size overflow"))?;
+                if read_size > usize::from(spans[span]) {
+                    return Err(invalid(name, "texture block exceeds stored span"));
+                }
                 let block_bytes = dat.read_at(start, read_size).await?;
                 let decoded_block = format::decode_block(&block_bytes, block.output_size)
                     .map_err(|e| invalid(name, e))?;

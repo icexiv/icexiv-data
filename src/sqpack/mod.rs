@@ -77,10 +77,11 @@
 //! # Supported extraction and limitations
 //!
 //! Supports Win32 little-endian version-1 index/index2 files, type-2 standard
-//! entries and type-4 texture entries, with raw or raw-DEFLATE blocks. Extract
+//! entries, type-3 model entries and type-4 texture entries, with raw or raw-DEFLATE blocks. Extract
 //! results length-check every table, block span and declared size. Textures are
 //! returned as the concatenated TEX file bytes, ready for [`crate::tex`]; the
-//! container layer does not decode pixels. Other content types (including models)
+//! container layer does not decode pixels. Models include a reconstructed logical
+//! header and every LOD buffer, ready for [`crate::mdl`]. Other content types
 //! return [`Error::UnsupportedContentType`]; flagged or ambiguous index entries
 //! return [`Error::UnsupportedIndexEntry`].
 //!
@@ -103,7 +104,10 @@ use index::Index;
 
 mod format;
 pub mod index;
+mod model;
 mod resource;
+mod texture;
+pub use texture::TextureGroup;
 
 #[cfg(all(feature = "local", not(target_arch = "wasm32")))]
 pub mod local;
@@ -184,6 +188,10 @@ pub enum Error<E> {
         file: String,
         reason: &'static str,
     },
+    TextureGroupOutOfBounds {
+        index: usize,
+        count: usize,
+    },
     AllocationFailed {
         requested: usize,
     },
@@ -221,6 +229,9 @@ impl<E: fmt::Display> fmt::Display for Error<E> {
             }
             Self::UnsupportedIndexEntry { file, reason } => {
                 write!(f, "unsupported SqPack index entry in {file}: {reason}")
+            }
+            Self::TextureGroupOutOfBounds { index, count } => {
+                write!(f, "texture group {index} exceeds group count {count}")
             }
             Self::AllocationFailed { requested } => {
                 write!(f, "could not allocate {requested} bytes")

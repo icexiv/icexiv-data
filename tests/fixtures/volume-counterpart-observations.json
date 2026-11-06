@@ -1,0 +1,13 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "report_sha256": "67078b1c1f5af93006dee5a8565dd5a1cf337a344ff1a767e5f542feb32cf764",
+  "inventory_sha256": "d0c538c50cc4de5cc6978ef25ecac2b0a3686c2d2a6518f3249317be504b3e69",
+  "gap_entries": 273,
+  "gap_base_groups": 177,
+  "complete_counterparts": 0,
+  "main_index_tables": 59,
+  "main_index_records": 1802972,
+  "flagged_records": 0,
+  "duplicate_hash_records": 0
+}

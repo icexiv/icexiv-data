@@ -1,0 +1,12 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "binary_sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "manifest_sha256": "cc4beb7cdb5129ad49baec01eea107ab032be23fcad356563a1fb32684c828b3",
+  "sampler_evidence_sha256": "23f596c160d9c8543aba824603e08985a6947ac42fc32da72ba35380b91d06e0",
+  "path_identities_sha256": "2c193f4f204e4514c708f128a5b49c4e4bd8aef1520219ab7e974401847d5170",
+  "report_sha256": "b5667a7c86197d654fbdfe3631e4510c3bc853090d5ff21cab4e21372a885126",
+  "output_identity_sha256": "89c184907edef6d7cc6532f7e5b0c0f28ab79650ac8220f8230ce5dd09d53ba5",
+  "short_resources": 273,
+  "complete_selected_mips": 678,
+  "incomplete_selected_mips": 966
+}

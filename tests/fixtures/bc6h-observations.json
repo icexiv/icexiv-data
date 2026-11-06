@@ -1,0 +1,11 @@
+{
+  "version":"2026.10.06.0000.0000",
+  "binary_sha256":"958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "format_function_rva":2195712,
+  "format_function_bytes":649,
+  "format_function_sha256":"096a14280cd43a1bac8362118f4869d2c6f2846978fc63b24aae559a347b1fa5",
+  "dat":"ex5/020505.win32.dat0",
+  "offset":94043776,
+  "resource_sha256":"ba7e0cdb2dce8f3b29b2ba56827fd7ab1d38d40fc4c9fda7b42d5a539a004cb4",
+  "float_oracle_sha256":"d8a4f827009d69c4eec65f0485e56c47b57a3c83747049fa8983c90ab806e1b9"
+}

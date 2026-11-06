@@ -1,0 +1,122 @@
+{
+  "kind": "volume-descriptor-block-job-and-task-dispatch-static-evidence",
+  "version": "2026.10.06.0000.0000",
+  "platform": "Windows AMD64 PE32+; preferred image base 0x140000000",
+  "binary_bytes": 51910400,
+  "binary_sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "archives": [
+    {
+      "directory": "../icexiv-data-evidence/volume-tex-handle-10",
+      "manifest_sha256": "64da505717d39dc077cd1aa8353483b54d2f948214b75a79565de30cc26ce340",
+      "sealed_files": 133,
+      "sealed_bytes": 1168071,
+      "review_level": "independent limited static review and main full-result replay",
+      "reports": [
+        {"file": "FINDINGS.md", "sha256": "1e0f944277eed658a3bfb35a6b0778e0ad3f6d3177c0c3afcb089209b31b40f2"},
+        {"file": "CORRECTIONS.md", "sha256": "d0777952481bef1c749b465e3a996cc0a1e648c8d18adb1153d89f6230977fca"},
+        {"file": "SOURCES.md", "sha256": "7f74e7d9a1f89965c20b9db24cde2a28415700b7294d51a44c19aee98d625941"},
+        {"file": "archive-validation.json", "sha256": "ee047ecd1844eb6975a7c4a323a4e53c4a73eb8cee53a5a5ae5f8efae2132388"},
+        {"file": "review/REVIEW.md", "sha256": "efd162ed0b4be08b96668d8f6c7416a72684417e77b32ca71016e29c3d96a07a"},
+        {"file": "review/verification.json", "sha256": "85f76c7a4ea9fc98578609b6229a865b2beca4b74f37323324736106782b825d"},
+        {"file": "review/semantic-review.json", "sha256": "fbfd585f4675dd828dac8198afd2be3db0a9826fea2b7f9d09df5a5ff23746f8"},
+        {"file": "review/verify.py", "sha256": "98e502744800dbf6cc3d189fcdc66d25f2b8a322de0b20289d43f23f409fb95a"}
+      ]
+    },
+    {
+      "directory": "../icexiv-data-evidence/volume-block-job-11",
+      "manifest_sha256": "9c5f31f691bc2b7420306a02737de7ecd727f7b22dcaaa039c7f4f546d870c9a",
+      "sealed_files": 82,
+      "sealed_bytes": 248102,
+      "review_level": "main-agent static analysis and complete byte replay; no independent semantic review",
+      "reports": [
+        {"file": "REPORT.md", "sha256": "34cdd468c54a8ac81fd2eb91db22ed0ceabc5cb80366721fcf35a3ab22dbb79b"},
+        {"file": "SOURCES.md", "sha256": "b62a6636011a70546a04c64cd9bafa2adc33828c65fc2bddcd102e4465573426"},
+        {"file": "FAILURES.md", "sha256": "5c8e4a7bb076222ed8aedaa063a3a6986acea2a7cf68116fa3c630dd5f1ec524"},
+        {"file": "queue-array-refs.json", "sha256": "d5a0b0022c59c73651b61bc41b2bb5c95b62322291032d1312f72b7c18f31363"}
+      ]
+    },
+    {
+      "directory": "../icexiv-data-evidence/volume-task-execution-12",
+      "manifest_sha256": "c862434fc4fd72f0f52993ab6ee9850006987a5e161572980bb6c44b2f1a9646",
+      "sealed_files": 45,
+      "sealed_bytes": 764673,
+      "review_level": "main-agent static analysis and complete byte replay; no independent semantic review",
+      "reports": [
+        {"file": "REPORT.md", "sha256": "30ae73be6c3065bda108b550653db4774fee92d70a717fe49b01bb6f1c589983"},
+        {"file": "SOURCES.md", "sha256": "e857e47135cb5a384e8a410d15ee381c54f24d114876671ece71eae9662b4bba"},
+        {"file": "FAILURES.md", "sha256": "b7ba58ed7bee5de36f6d3a9728b2f25076c1c0e08d965389a34ac4a05eaa7616"},
+        {"file": "chain-validation.json", "sha256": "2f7341e838fd65a4c8a6f4003f3fa430724563311f28db79b33e9351258d8122"},
+        {"file": "verify_chain.py", "sha256": "94632eeb207894ef7b9a97f7c24d4f89438dca32f12eaf38bb425bb3ff43b395"}
+      ]
+    }
+  ],
+  "independent_handle_review": {
+    "handle_slots": 45,
+    "override_slots": 23,
+    "new_code_entries": 30,
+    "code_bytes_including_leaf_padding": 8357,
+    "leaf_padding_bytes": 196,
+    "data_bytes": 880,
+    "decoded_rows": 2186,
+    "semantic_intervals": 19,
+    "full_result_bytes": 678390,
+    "full_result_byte_equal": true,
+    "excluded_result_fields": [],
+    "stored_length_check": "u32(sum(group+4)) == stored_total",
+    "destination_length_check": "destination_end - destination_begin == capacity_total",
+    "block_decoded_sum_checked_against_mip_capacity": false,
+    "buffer_source_step": "group+4",
+    "stream_source_position": "group+0",
+    "stream_group_length": "group+4",
+    "destination_step": "u32(S_m * max(D >> (m & 31), 1))"
+  },
+  "main_job_and_dispatch_verification": {
+    "new_code_entries_11": 12,
+    "pdata_bytes_11": 7505,
+    "explicit_code_bytes_11": 16,
+    "embedded_jump_table_bytes_11": 128,
+    "new_code_entries_12": 7,
+    "code_bytes_12": 1416,
+    "leaf_padding_bytes_12": 17,
+    "full_result_bytes": 670648,
+    "full_result_byte_equal": true,
+    "excluded_result_fields": [],
+    "decoded_code_or_alignment_rows": 2347,
+    "bound_sources": 154,
+    "independent_semantic_review": false,
+    "worker_callsite": "0x1405e619a",
+    "callback_target_expression": "*(u64*)task",
+    "callback_argument_1": "task+0x48",
+    "callback_argument_2": "task",
+    "task_source_offset": 80,
+    "task_destination_offset": 120,
+    "task_capacity_offset": 128,
+    "callback_reads_task_capacity": false,
+    "raw_copy_bytes": "block u32 at +0x0c; via stack buffer",
+    "compressed_copy_bytes": "length slot after wrapper; initial value 16384",
+    "wrapper_updates_length_condition": "decoder return equals 1",
+    "callback_checks_wrapper_return": false,
+    "worker_completion_proves_decode_success": false,
+    "version_literal": "1.2.5",
+    "version_literal_proves_unmodified_codec_identity": false,
+    "queue_array_query_runs": 1,
+    "queue_array_query_candidates": 7,
+    "confirmed_query_candidates": 2,
+    "full_crt_thread_context_chain_closed": false
+  },
+  "qualifications": [
+    "10 CORRECTIONS.md preserves and corrects the independent review's complete_mip0 wording; 0/273 refers to six-level reconstruction",
+    "Stored bytes, conditional static paths, main-agent analysis and independent review have separate scopes",
+    "No actual worker execution, allocator contents or installed loading branch was observed",
+    "Command allocation may fail; command11 is not named as a D3D API solely from its number",
+    "The native decoder's full semantics and external callees were not independently proved",
+    "Address intervals and rounded task capacity do not define missing pixels"
+  ],
+  "complete_base_read_count": 273,
+  "six_level_reconstruction_count": 0,
+  "short_resources": 273,
+  "missing_logical_bytes": 603624,
+  "accepted_missing_bytes": 0,
+  "mip_generator_identified": false,
+  "tex_prefix_writer_identified": false
+}

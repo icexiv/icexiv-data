@@ -1,0 +1,22 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "report_sha256": "9ebad014ea3225a7b355bebee05874fc9b075897c1a3ab73064313838adfb027",
+  "results_sha256": "a6926c6e3b074041c62e4218761fe7475bdf1ae86f65f27607c10c02f76bb693",
+  "total_tables": 5620,
+  "additional_native_ranges": [
+    {"rva":"0x42b1bf","bytes":625,"sha256":"5a120470719bc71d3a12cd6ed905ce61076943503c83e01dfa7a7e7486511f14"},
+    {"rva":"0x42b730","bytes":547,"sha256":"60423b307f23e31ee70db1a09ff3742918f389414d886e094458fa0622efd5fa"},
+    {"rva":"0x1883cf0","bytes":331,"sha256":"079cf97b464f7c496b0f653d352c0bc1b5eb8f40bda4b8050693464285066003"},
+    {"rva":"0x426c20","bytes":128,"sha256":"b239d1758d757d94caf143bd8f1afb74e945bed4ecb570fcd236df762341a013"},
+    {"rva":"0x426e06","bytes":122,"sha256":"bc17e8a878e32209d232760f1a2c98480831e53aedba3bb211a8f00256dc88bc"}
+  ],
+  "resource_references": [
+    {"lea_rva":"0x426c63","string_rva":"0x21673b0","path":"shader/sm5/shpk/characterlegacy.shpk"},
+    {"lea_rva":"0x426e0b","string_rva":"0x2167568","path":"chara/base_material/stainingtemplate_gud.stm"},
+    {"lea_rva":"0x426e39","string_rva":"0x2167598","path":"chara/base_material/stainingtemplate.stm"}
+  ],
+  "stm_sha256": [
+    "c0210e02a1f6851f3d3fcba9c61efbb153d2086cb512b48afac3d3615f4f721e",
+    "81648516a871c694b4c4883898a195b00971f0041e3bb8d9fdfb65f511d69a94"
+  ]
+}

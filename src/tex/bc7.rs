@@ -4,7 +4,7 @@
 //! published by Microsoft and the DirectXTex reference tables. Invalid bitstreams
 //! return errors instead of approximating pixels.
 
-use super::Mip;
+use super::Surface;
 
 const PIXELS: usize = 16;
 
@@ -115,7 +115,7 @@ const WEIGHTS2: [u16; 4] = [0, 21, 43, 64];
 const WEIGHTS3: [u16; 8] = [0, 9, 18, 27, 37, 46, 55, 64];
 const WEIGHTS4: [u16; 16] = [0, 4, 9, 13, 17, 21, 26, 30, 34, 38, 43, 47, 51, 55, 60, 64];
 
-pub(super) fn decode(mip: Mip<'_>, output: &mut [u8]) -> Result<(), &'static str> {
+pub(super) fn decode(mip: Surface<'_>, output: &mut [u8]) -> Result<(), &'static str> {
     let width = usize::from(mip.width);
     let height = usize::from(mip.height);
     let columns = width.div_ceil(4);

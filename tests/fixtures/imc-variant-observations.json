@@ -1,0 +1,24 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "report_sha256": "9c0bd47a2cbdc016151a5b344d713ea63fe51ac5538e3b5a66cd9e5281a6c1ef",
+  "discovery_sha256": "2efdcd0d85cbc426615474c4b0c7c7486949ddd5127a189435b619541786ea94",
+  "rows_sha256": "67d7f077d72f2c52f2ff77bfd15bff2fa46784573f0646790f2034d0b0ca1bd9",
+  "index_table_sha256": "3570cbbd52654e524629b3e083669b6d844e5c251a88a9c655a988700abff051",
+  "candidate_paths": 19998,
+  "files_verified": 1812,
+  "records_verified": 53690,
+  "nonzero_decal": 82,
+  "nonzero_vfx": 71,
+  "nonzero_animation": 2,
+  "animation_witness": {
+    "path": "chara/equipment/e0137/e0137.imc",
+    "sha256": "ea747bc16d958ca93c912bfed36e6fdff6c11b6f9901b228e55dfc38ec126110",
+    "subsets": [1, 2], "part": 1, "raw_animation": 10
+  },
+  "decal_witness": {
+    "path": "chara/equipment/e0002/e0002.imc",
+    "sha256": "d8f07e9e7e6b5af25c00caee926294b0920780c318110379521e4425ebe2f2cb",
+    "subset": 179, "part": 1, "decal_id": 201
+  }
+}

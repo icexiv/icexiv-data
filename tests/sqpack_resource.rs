@@ -130,6 +130,210 @@ fn index(index2: bool, records: &[(u64, u32)]) -> Vec<u8> {
     bytes
 }
 
+fn collision_index(paths: &[(&str, u32)], sentinel_unknown: u32) -> Vec<u8> {
+    let hash = !crc32fast::hash(paths[0].0.as_bytes());
+    let mut bytes = index(true, &[(u64::from(hash), 1)]);
+    let offset = bytes.len();
+    put32(&mut bytes, 0x454, offset as u32);
+    put32(&mut bytes, 0x458, ((paths.len() + 1) * 256) as u32);
+    for (sequence, &(path, packed)) in paths.iter().enumerate() {
+        let start = bytes.len();
+        bytes.resize(start + 256, 0xa5); // NUL trailing bytes are not padding.
+        put32(&mut bytes, start, hash);
+        put32(&mut bytes, start + 4, 0x12345678);
+        put32(&mut bytes, start + 8, packed);
+        put32(&mut bytes, start + 12, sequence as u32);
+        bytes[start + 16..start + 16 + path.len()].copy_from_slice(path.as_bytes());
+        bytes[start + 16 + path.len()] = 0;
+    }
+    let start = bytes.len();
+    bytes.resize(start + 256, 0x5a);
+    put32(&mut bytes, start, u32::MAX);
+    put32(&mut bytes, start + 4, sentinel_unknown);
+    put32(&mut bytes, start + 8, 0);
+    put32(&mut bytes, start + 12, u32::MAX);
+    bytes[start + 16] = 0;
+    bytes
+}
+
+#[test]
+fn index2_names_preserve_wire_bytes_and_reject_ambiguous_paths() {
+    // Real observed pair; no game bytes embedded. Their independent JAMCRC is
+    // fixed by the read-only inventory, not selected by this synthetic writer.
+    let a = "bgcommon/world/common/vfx_for_bg/texture/bomb101zy.atex";
+    let b = "bgcommon/world/evt/shared/for_pln/sgpl_a_evt_vfx01_bomber_v.sgb";
+    assert_eq!(!crc32fast::hash(a.as_bytes()), 0x118cb727);
+    assert_eq!(!crc32fast::hash(b.as_bytes()), 0x118cb727);
+    for unknown in [0, u32::MAX] {
+        let bytes = collision_index(&[(a, 16), (b, 34)], unknown);
+        let parsed = Index::parse(&bytes, IndexKind::Index2).unwrap();
+        assert_eq!(
+            parsed.find_path(a).unwrap(),
+            Some(Location {
+                dat: 0,
+                offset: 128
+            })
+        );
+        assert_eq!(
+            parsed.find_path(&b.to_ascii_uppercase()).unwrap(),
+            Some(Location {
+                dat: 1,
+                offset: 256
+            })
+        );
+        assert_eq!(parsed.find_path("exd/absent.exh").unwrap(), None);
+        let rows: Vec<_> = parsed.collision_records().unwrap().collect();
+        assert_eq!(rows[0].unknown(), 0x12345678);
+        assert_eq!(rows[1].sequence(), 1);
+        assert_eq!(rows[0].raw()[255], 0xa5);
+        assert!(rows[2].is_sentinel());
+        assert_eq!(rows[2].unknown(), unknown);
+        assert_eq!(rows[2].raw()[255], 0x5a);
+        assert_eq!(parsed.byte_len(), 8 + 768);
+        assert_eq!(
+            Index::parse_with_collision_budget(&bytes, IndexKind::Index2, 767)
+                .unwrap_err()
+                .reason,
+            "collision table budget exceeded"
+        );
+        let table = Index::from_table(&bytes[0x800..0x808], IndexKind::Index2).unwrap();
+        assert_eq!(
+            table.find_path(a).unwrap_err().reason,
+            "collision name table unavailable"
+        );
+    }
+    let bytes = collision_index(&[(a, 16), (a, 32)], 0);
+    assert_eq!(
+        Index::parse(&bytes, IndexKind::Index2)
+            .unwrap()
+            .find_path(a)
+            .unwrap_err()
+            .reason,
+        "ambiguous duplicate collision path"
+    );
+    let bytes = collision_index(&[(b, 32)], 0);
+    assert_eq!(
+        Index::parse(&bytes, IndexKind::Index2)
+            .unwrap()
+            .find_path(a)
+            .unwrap(),
+        None
+    );
+    let mut bytes = collision_index(&[(a, 16)], 0);
+    let duplicate = bytes[0x800..0x808].to_vec();
+    bytes.splice(0x808..0x808, duplicate);
+    put32(&mut bytes, 0x40c, 16);
+    put32(&mut bytes, 0x454, 0x810);
+    assert_eq!(
+        Index::parse(&bytes, IndexKind::Index2)
+            .unwrap()
+            .find_path(a)
+            .unwrap_err()
+            .reason,
+        "ambiguous duplicate hash; collision resolution not supported"
+    );
+}
+
+#[test]
+fn index2_auxiliary_spans_and_records_are_bounded() {
+    let original = collision_index(&[(PATH, 16)], 0);
+    for (at, value, reason) in [
+        (0x454, 0x400, "collision table overlaps headers"),
+        (0x454, 0x800, "collision table overlaps main table"),
+        (0x454, u32::MAX, "file range out of bounds"),
+        (0x458, 513, "partial collision record"),
+        (0x808, 0, "collision path hash mismatch"),
+        (0x810, 1, "flagged collision location"),
+    ] {
+        let mut bytes = original.clone();
+        put32(&mut bytes, at, value);
+        assert_eq!(
+            Index::parse(&bytes, IndexKind::Index2).unwrap_err().reason,
+            reason
+        );
+    }
+    let mut bytes = original.clone();
+    bytes[0x818..0x908].fill(b'x');
+    assert_eq!(
+        Index::parse(&bytes, IndexKind::Index2).unwrap_err().reason,
+        "unterminated collision path"
+    );
+    let mut bytes = original.clone();
+    let sentinel = bytes[0x908..0xa08].to_vec();
+    bytes[0x808..0x908].copy_from_slice(&sentinel);
+    assert_eq!(
+        Index::parse(&bytes, IndexKind::Index2).unwrap_err().reason,
+        "collision sentinel is not final"
+    );
+    for length in 0..original.len() {
+        assert!(Index::parse(&original[..length], IndexKind::Index2).is_err());
+    }
+}
+
+#[test]
+fn index2_only_backend_reads_collision_and_propagates_auxiliary_io_errors() {
+    let mut memory = Memory::default();
+    let bytes = collision_index(&[(PATH, 0x100)], u32::MAX);
+    memory.insert(format!("{STEM}.index2"), bytes);
+    memory.insert(
+        format!("{STEM}.dat0"),
+        dat(&[(b"collision payload", false)]),
+    );
+    let opens = memory.opens.clone();
+    let fail_at = memory.fail_read_at.clone();
+    let pack = SqPack::new(memory);
+    assert_eq!(block_on(pack.read(PATH)).unwrap(), b"collision payload");
+    assert!(opens.borrow().iter().any(|s| s.ends_with(".index2")));
+    *fail_at.borrow_mut() = Some(0x808);
+    assert_eq!(
+        block_on(pack.read(PATH)).unwrap_err(),
+        Error::Source("injected read failure")
+    );
+}
+
+#[test]
+fn index2_auxiliary_read_budget_is_checked_before_io() {
+    let mut memory = Memory::default();
+    memory.insert(
+        format!("{STEM}.index2"),
+        collision_index(&[(PATH, 0x100)], 0),
+    );
+    let reads = memory.reads.clone();
+    let pack = SqPack::new(memory).with_max_read_bytes(Some(511));
+    assert_eq!(
+        block_on(pack.read(PATH)).unwrap_err(),
+        Error::ReadTooLarge {
+            requested: 512,
+            limit: 511
+        }
+    );
+    assert!(!reads.borrow().iter().any(|(_, offset, _)| *offset == 0x808));
+}
+
+#[test]
+fn index2_cache_budget_includes_collision_bytes() {
+    for (budget, expected_reads) in [(8, 2), (520, 1)] {
+        let mut memory = Memory::default();
+        memory.insert(
+            format!("{STEM}.index2"),
+            collision_index(&[(PATH, 0x100)], 0),
+        );
+        memory.insert(format!("{STEM}.dat0"), dat(&[(b"cached", false)]));
+        let reads = memory.reads.clone();
+        let pack = SqPack::new(memory).with_index_cache(Some(budget));
+        assert_eq!(block_on(pack.read(PATH)).unwrap(), b"cached");
+        assert_eq!(block_on(pack.read(PATH)).unwrap(), b"cached");
+        assert_eq!(
+            reads
+                .borrow()
+                .iter()
+                .filter(|(name, at, _)| name.ends_with(".index2") && *at == 0x808)
+                .count(),
+            expected_reads
+        );
+    }
+}
+
 fn dat(blocks: &[(&[u8], bool)]) -> Vec<u8> {
     let mut bytes = container(1);
     bytes.resize(0x880, 0);
@@ -181,6 +385,133 @@ fn fixture(stem: &str, index2: bool, dat_id: u8, blocks: &[(&[u8], bool)]) -> Me
     );
     memory.insert(format!("{stem}.dat{dat_id}"), dat(blocks));
     memory
+}
+
+fn model_fixture() -> (Memory, Vec<Vec<u8>>) {
+    let payloads: Vec<Vec<u8>> = (0..11).map(|i| vec![i as u8 + 1; 17 + i * 3]).collect();
+    let mut data = container(1);
+    data.resize(0x900, 0);
+    put32(&mut data, 0x800, 256);
+    put32(&mut data, 0x804, 3);
+    put32(
+        &mut data,
+        0x808,
+        68 + payloads.iter().map(|v| v.len() as u32).sum::<u32>(),
+    );
+    put32(&mut data, 0x814, 0x0100_0006);
+    put16(&mut data, 0x8c8, 3);
+    put16(&mut data, 0x8ca, 2);
+    data[0x8cc..0x8cf].copy_from_slice(&[3, 1, 1]);
+    // Physical order intentionally differs from logical segment order.
+    for (i, payload) in payloads.iter().enumerate() {
+        let compressed = i % 2 != 0;
+        let encoded = if compressed {
+            let mut encoder =
+                flate2::write::DeflateEncoder::new(Vec::new(), flate2::Compression::default());
+            encoder.write_all(payload).unwrap();
+            encoder.finish().unwrap()
+        } else {
+            payload.clone()
+        };
+        let start = data.len();
+        let span = (encoded.len() + 16).div_ceil(128) * 128;
+        put32(&mut data, 0x818 + i * 4, 128);
+        put32(&mut data, 0x844 + i * 4, span as u32);
+        put32(&mut data, 0x870 + i * 4, (start - 0x900) as u32);
+        put16(&mut data, 0x89c + i * 2, i as u16);
+        put16(&mut data, 0x8b2 + i * 2, 1);
+        put16(&mut data, 0x8d0 + i * 2, span as u16);
+        data.resize(start + span, 0);
+        put32(&mut data, start, 16);
+        put32(
+            &mut data,
+            start + 8,
+            if compressed {
+                encoded.len() as u32
+            } else {
+                32000
+            },
+        );
+        put32(&mut data, start + 12, payload.len() as u32);
+        data[start + 16..start + 16 + encoded.len()].copy_from_slice(&encoded);
+    }
+    let mut memory = fixture(STEM, false, 0, &[]);
+    memory.insert(format!("{STEM}.dat0"), data);
+    (memory, payloads)
+}
+
+#[test]
+fn model_reconstruction_keeps_all_segments_and_writes_exact_logical_offsets() {
+    let (memory, payloads) = model_fixture();
+    let output = block_on(SqPack::new(memory).read(PATH)).unwrap();
+    assert_eq!(&output[..4], &0x0100_0006u32.to_le_bytes());
+    assert_eq!(&output[4..8], &(payloads[0].len() as u32).to_le_bytes());
+    assert_eq!(&output[8..12], &(payloads[1].len() as u32).to_le_bytes());
+    assert_eq!(&output[12..16], &[3, 0, 2, 0]);
+    assert_eq!(&output[64..68], &[3, 1, 1, 0]);
+    let mut cursor = 68;
+    for i in [0, 1, 2, 5, 8, 3, 6, 9, 4, 7, 10] {
+        assert_eq!(&output[cursor..cursor + payloads[i].len()], &payloads[i]);
+        if (2..5).contains(&i) || i >= 8 {
+            let field = if i < 5 {
+                16 + (i - 2) * 4
+            } else {
+                28 + (i - 8) * 4
+            };
+            assert_eq!(&output[field..field + 4], &(cursor as u32).to_le_bytes());
+        }
+        cursor += payloads[i].len();
+    }
+    assert_eq!(output.len(), cursor);
+}
+
+#[test]
+fn explicit_entry_locations_preserve_extraction_and_error_checks() {
+    let memory = fixture(STEM, false, 0, &[(b"located", true)]);
+    let sqpack = SqPack::new(memory);
+    assert_eq!(
+        block_on(sqpack.read_entry(&format!("{STEM}.dat0"), 0x800)).unwrap(),
+        b"located"
+    );
+    assert!(block_on(sqpack.read_entry(&format!("{STEM}.dat0"), u64::MAX)).is_err());
+    assert!(block_on(sqpack.read_entry(&format!("{STEM}.dat0"), 0x400)).is_err());
+}
+
+#[test]
+fn model_rejects_overlaps_bad_spans_bad_sizes_and_truncated_metadata() {
+    for (offset, value, width) in [
+        (0x800, 128, 4),   // specialized metadata does not fit
+        (0x808, 69, 4),    // output budget smaller than decoded data
+        (0x818, 256, 4),   // wrong rounded segment capacity
+        (0x844, 256, 4),   // stored size disagrees with spans
+        (0x874, 0, 4),     // overlapping physical segments
+        (0x89e, 0, 2),     // duplicate block indices
+        (0x89c, 65535, 2), // span table range overflow
+        (0x8cc, 4, 1),     // impossible LOD count
+        (0x8d0, 1, 2),     // block span shorter than prefix
+        (0x90c, 65536, 4), // invalid individual block expansion
+    ] {
+        let (mut memory, _) = model_fixture();
+        let data = memory.mutate(&format!("{STEM}.dat0"));
+        match width {
+            4 => put32(data, offset, value),
+            2 => put16(data, offset, value as u16),
+            _ => data[offset] = value as u8,
+        }
+        assert!(
+            block_on(SqPack::new(memory).read(PATH)).is_err(),
+            "offset {offset:x}"
+        );
+    }
+    let (memory, _) = model_fixture();
+    assert!(matches!(
+        block_on(
+            SqPack::new(memory)
+                .with_max_read_bytes(Some(100))
+                .read(PATH)
+        ),
+        Err(Error::ReadTooLarge { .. })
+    ));
 }
 
 #[test]
@@ -478,7 +809,7 @@ fn ambiguous_hashes_and_synonyms_do_not_return_guessed_data() {
 
 #[test]
 fn specialized_entries_are_explicitly_unsupported_not_missing() {
-    for kind in [1, 3, 99] {
+    for kind in [1, 99] {
         let mut memory = fixture(STEM, false, 0, &[(b"data", false)]);
         put32(memory.mutate(&format!("{STEM}.dat0")), 0x804, kind);
         assert!(
@@ -639,6 +970,328 @@ fn texture_fixture(header: &[u8], blocks: &[(&[u8], bool)]) -> Memory {
     memory
 }
 
+fn selective_volume_fixture(short: bool, compressed: bool) -> Memory {
+    let mut header = [0; 80];
+    put32(&mut header, 0, 0x0100_0000);
+    put32(&mut header, 4, 0x1450);
+    put16(&mut header, 8, 2);
+    put16(&mut header, 10, 2);
+    put16(&mut header, 12, 4);
+    header[14] = 3;
+    for (i, offset) in [80, 144, 152].into_iter().enumerate() {
+        put32(&mut header, 28 + i * 4, offset);
+    }
+    let mut dat = container(1);
+    dat.resize(0x880, 0);
+    put32(&mut dat, 0x800, 128);
+    put32(&mut dat, 0x804, 4);
+    put32(&mut dat, 0x808, 156);
+    put32(&mut dat, 0x814, 3);
+    dat.extend(header);
+    for (i, size) in [64, if short { 4 } else { 8 }, 4].into_iter().enumerate() {
+        let payload = [1, 2, 3, 4].repeat(size / 4);
+        let encoded = if compressed {
+            deflate(&payload)
+        } else {
+            payload
+        };
+        let span = (16 + encoded.len()).div_ceil(16) * 16;
+        let start = dat.len();
+        let row = 0x818 + i * 20;
+        put32(&mut dat, row, (start - 0x880) as u32);
+        put32(&mut dat, row + 4, span as u32);
+        put32(&mut dat, row + 8, size as u32);
+        put32(&mut dat, row + 12, i as u32);
+        put32(&mut dat, row + 16, 1);
+        put16(&mut dat, 0x854 + i * 2, span as u16);
+        dat.resize(start + span, 0);
+        put32(&mut dat, start, 16);
+        put32(
+            &mut dat,
+            start + 8,
+            if compressed {
+                encoded.len() as u32
+            } else {
+                32000
+            },
+        );
+        put32(&mut dat, start + 12, size as u32);
+        dat[start + 16..start + 16 + encoded.len()].copy_from_slice(&encoded);
+    }
+    let mut memory = Memory::default();
+    memory.insert(format!("{STEM}.index"), index(false, &[(HASH, 0x800 / 8)]));
+    memory.insert(format!("{STEM}.dat0"), dat);
+    memory
+}
+
+#[test]
+fn complete_selected_volume_mips_decode_without_fabricating_the_full_file() {
+    for compressed in [false, true] {
+        let memory = selective_volume_fixture(true, compressed);
+        let reads = memory.reads.clone();
+        let dat = &memory.files[&format!("{STEM}.dat0")];
+        let last_selected = 0x880
+            + u64::from(u32::from_le_bytes(dat[0x818..0x81c].try_into().unwrap()))
+            + u64::from(u32::from_le_bytes(dat[0x81c..0x820].try_into().unwrap()));
+        let sqpack = SqPack::new(memory).with_max_read_bytes(Some(144));
+        let group = block_on(sqpack.read_texture_group(PATH, 0)).unwrap();
+        assert_eq!(group.index(), 0);
+        assert_eq!(group.group_count(), 3);
+        assert_eq!(group.declared_file_size(), 156);
+        assert_eq!(group.prefix()[14], 3);
+        let mip = group.volume_mip().unwrap();
+        assert_eq!((mip.width(), mip.height(), mip.depth()), (2, 2, 4));
+        assert_eq!((mip.source_index(), mip.source_mip_count()), (0, 3));
+        assert_eq!(mip.decode_rgba8(64).unwrap(), [3, 2, 1, 4].repeat(16));
+        assert!(mip.decode_rgba8(63).is_err());
+        // Prefix/table reads and the selected blocks are the complete I/O scope.
+        assert!(
+            reads
+                .borrow()
+                .iter()
+                .filter(|(name, _, _)| name.ends_with(".dat0"))
+                .all(|(_, offset, length)| offset + *length as u64 <= last_selected)
+        );
+        assert!(matches!(
+            block_on(sqpack.read(PATH)),
+            Err(Error::ReadTooLarge {
+                requested: 156,
+                limit: 144
+            })
+        ));
+        let short = block_on(sqpack.read_texture_group(PATH, 1)).unwrap();
+        assert_eq!(
+            short.volume_mip().unwrap_err(),
+            icexiv_data::tex::Error::MipSizeMismatch {
+                index: 1,
+                expected: 8,
+                actual: 4
+            }
+        );
+        let tail = block_on(sqpack.read_texture_group(PATH, 2)).unwrap();
+        assert_eq!(
+            tail.volume_mip().unwrap().decode_rgba8(4).unwrap(),
+            [3, 2, 1, 4]
+        );
+        assert!(matches!(
+            block_on(sqpack.read_texture_group(PATH, 3)),
+            Err(Error::TextureGroupOutOfBounds { index: 3, count: 3 })
+        ));
+    }
+    let sqpack = SqPack::new(selective_volume_fixture(true, false));
+    assert!(matches!(
+        block_on(sqpack.read(PATH)),
+        Err(Error::InvalidData {
+            reason: "decoded size disagrees with entry size",
+            ..
+        })
+    ));
+    let sqpack = SqPack::new(selective_volume_fixture(true, false)).with_max_read_bytes(Some(143));
+    assert!(matches!(
+        block_on(sqpack.read_texture_group_entry(&format!("{STEM}.dat0"), 0x800, 0)),
+        Err(Error::ReadTooLarge {
+            requested: 144,
+            limit: 143
+        })
+    ));
+}
+
+#[test]
+fn selected_group_checks_all_metadata_but_only_its_own_streams() {
+    let mut memory = selective_volume_fixture(false, true);
+    // Damage the second group's DEFLATE stream, leaving all table spans intact.
+    let bytes = memory.mutate(&format!("{STEM}.dat0"));
+    let second = 0x880 + u32::from_le_bytes(bytes[0x82c..0x830].try_into().unwrap()) as usize;
+    bytes[second + 16] = 0xff;
+    let sqpack = SqPack::new(memory);
+    assert!(
+        block_on(sqpack.read_texture_group(PATH, 0))
+            .unwrap()
+            .volume_mip()
+            .is_ok()
+    );
+    assert!(matches!(
+        block_on(sqpack.read_texture_group(PATH, 1)),
+        Err(Error::InvalidData { .. })
+    ));
+    for (offset, value) in [
+        (0x82c, 80),
+        (0x838, 0),
+        (0x830, 1),
+        (0x834, u32::MAX),
+        (0x83c, 0),
+    ] {
+        let mut memory = selective_volume_fixture(false, true);
+        put32(memory.mutate(&format!("{STEM}.dat0")), offset, value);
+        assert!(matches!(
+            block_on(SqPack::new(memory).read_texture_group(PATH, 0)),
+            Err(Error::InvalidData { .. })
+        ));
+    }
+    let mut memory = selective_volume_fixture(false, true);
+    memory.mutate(&format!("{STEM}.dat0")).pop();
+    assert!(matches!(
+        block_on(SqPack::new(memory).read_texture_group(PATH, 0)),
+        Err(Error::InvalidData { .. })
+    ));
+    for offset in [0x818, 0x854, 0x880, 0x8d0] {
+        let memory = selective_volume_fixture(false, true);
+        *memory.fail_read_at.borrow_mut() = Some(offset);
+        assert!(matches!(
+            block_on(SqPack::new(memory).read_texture_group(PATH, 0)),
+            Err(Error::Source("injected read failure"))
+        ));
+    }
+}
+
+#[test]
+fn selected_group_can_contain_multiple_blocks_without_claiming_a_mip() {
+    let memory = texture_fixture(&[0x42; 80], &[(&[7; 64], true), (&[9; 32], false)]);
+    let group = block_on(SqPack::new(memory).read_texture_group(PATH, 0)).unwrap();
+    assert_eq!(group.prefix(), &[0x42; 80]);
+    assert_eq!(group.data(), [&[7; 64][..], &[9; 32]].concat());
+    assert!(group.volume_mip().is_err());
+}
+
+#[test]
+fn selected_group_with_unspecified_length_respects_other_declared_groups() {
+    let name = format!("{STEM}.dat0");
+    for declared_size in [156, 155] {
+        let mut memory = selective_volume_fixture(false, true);
+        let bytes = memory.mutate(&name);
+        put32(bytes, 0x820, 0); // First group's length is defined by its blocks.
+        put32(bytes, 0x808, declared_size);
+        let result = block_on(SqPack::new(memory).read_texture_group_entry(&name, 0x800, 0));
+        if declared_size == 156 {
+            assert_eq!(result.unwrap().data(), [1, 2, 3, 4].repeat(16));
+        } else {
+            assert!(matches!(
+                result,
+                Err(Error::InvalidData {
+                    reason: "texture group block exceeds declared output",
+                    ..
+                })
+            ));
+        }
+    }
+}
+
+#[test]
+fn volume_binding_checks_original_header_and_logical_identity() {
+    let name = format!("{STEM}.dat0");
+    let mut memory = selective_volume_fixture(false, false);
+    for offset in [28, 32, 36] {
+        put32(memory.mutate(&name), 0x880 + offset, 80);
+    }
+    let sqpack = SqPack::new(memory);
+    let group = block_on(sqpack.read_texture_group(PATH, 1)).unwrap();
+    assert_eq!(group.prefix()[28..40], 80u32.to_le_bytes().repeat(3));
+    let mip = group.volume_mip().unwrap();
+    assert_eq!((mip.source_index(), mip.source_mip_count()), (1, 3));
+    assert_eq!(mip.decode_rgba8(8).unwrap(), [3, 2, 1, 4].repeat(2));
+    for (offset, value) in [
+        (0x808, 157),         // Container logical length disagrees with TEX dimensions.
+        (0x880 + 14, 2),      // Original mip count disagrees with group count.
+        (0x880 + 36, 153),    // Gap between logical mip ranges.
+        (0x880, 0x0080_0000), // Dimensions do not describe a volume.
+    ] {
+        let mut memory = selective_volume_fixture(false, false);
+        put32(memory.mutate(&name), offset, value);
+        let group = block_on(SqPack::new(memory).read_texture_group(PATH, 0)).unwrap();
+        assert!(group.volume_mip().is_err());
+    }
+}
+
+#[test]
+fn texture_unaccounted_output_is_not_fabricated_as_zeroes() {
+    let mut memory = texture_fixture(&[0; 80], &[(&[1; 16], false)]);
+    let dat = memory.mutate(&format!("{STEM}.dat0"));
+    put32(dat, 0x808, 112);
+    assert!(matches!(
+        block_on(SqPack::new(memory).read(PATH)),
+        Err(Error::InvalidData {
+            reason: "decoded size disagrees with entry size",
+            ..
+        })
+    ));
+}
+#[test]
+fn volume_group_size_gaps_remain_errors_with_valid_tex_headers_and_all_six_groups() {
+    // Shapes and lengths independently observed in the two authorized samples;
+    // payloads below are ours, not redistributed game data. A matching group
+    // length is not evidence that the complete TEX mip slot has been supplied.
+    for (depth, observed) in [
+        (24u16, [24576usize, 1536, 64, 16, 8, 4]),
+        (32u16, [32768usize, 2048, 128, 16, 8, 4]),
+    ] {
+        let mut tex = vec![0; 80];
+        put32(&mut tex, 0, 0x0100_0000);
+        put32(&mut tex, 4, 0x1450);
+        put16(&mut tex, 8, 8);
+        put16(&mut tex, 10, 32);
+        put16(&mut tex, 12, depth);
+        tex[14] = 6;
+        let mut complete = [0usize; 6];
+        let mut end = 80;
+        for (mip, size) in complete.iter_mut().enumerate() {
+            put32(&mut tex, 28 + mip * 4, end as u32);
+            *size = (8usize >> mip).max(1)
+                * (32usize >> mip).max(1)
+                * (usize::from(depth) >> mip).max(1)
+                * 4;
+            end += *size;
+        }
+        assert_eq!(end, if depth == 24 { 28172 } else { 37540 });
+        for sizes in [observed, complete] {
+            let mut dat = container(1);
+            dat.resize(0x900, 0);
+            put32(&mut dat, 0x800, 256);
+            put32(&mut dat, 0x804, 4);
+            put32(&mut dat, 0x808, end as u32);
+            put32(&mut dat, 0x814, 6);
+            dat.extend_from_slice(&tex);
+            for (mip, size) in sizes.into_iter().enumerate() {
+                let start = dat.len();
+                let span = (16 + size).div_ceil(16) * 16;
+                let row = 0x818 + mip * 20;
+                put32(&mut dat, row, (start - 0x900) as u32);
+                put32(&mut dat, row + 4, span as u32);
+                put32(&mut dat, row + 8, size as u32);
+                put32(&mut dat, row + 12, mip as u32);
+                put32(&mut dat, row + 16, 1);
+                put16(&mut dat, 0x890 + mip * 2, span as u16);
+                dat.resize(start + span, 0);
+                put32(&mut dat, start, 16);
+                put32(&mut dat, start + 8, 32000);
+                put32(&mut dat, start + 12, size as u32);
+                dat[start + 16..start + 16 + size].fill(0x35 + mip as u8);
+            }
+            let mut memory = Memory::default();
+            memory.insert(format!("{STEM}.dat0"), dat);
+            let result = block_on(SqPack::new(memory).read_entry(&format!("{STEM}.dat0"), 0x800));
+            if sizes == observed {
+                assert!(matches!(
+                    result,
+                    Err(Error::InvalidData {
+                        reason: "decoded size disagrees with entry size",
+                        ..
+                    })
+                ));
+            } else {
+                let bytes = result.unwrap();
+                assert_eq!(bytes.len(), end);
+                let texture = icexiv_data::tex::Tex::parse(&bytes).unwrap();
+                assert_eq!(texture.depth(), depth);
+                for (mip, size) in complete.into_iter().enumerate() {
+                    assert_eq!(
+                        texture.mip(mip).unwrap().data(),
+                        vec![0x35 + mip as u8; size]
+                    );
+                }
+            }
+        }
+    }
+}
 #[test]
 fn texture_entries_reassemble_the_prefix_and_every_data_block() {
     let header = [0x42u8; 80];
@@ -665,6 +1318,42 @@ fn dat_segments_without_a_container_header_are_readable() {
 }
 
 #[test]
+fn texture_groups_use_first_span_indices_not_mip_numbers() {
+    for mutation in 0..4 {
+        let mut memory = texture_fixture(&[0x42; 80], &[(&[7; 64], false), (&[9; 32], false)]);
+        let bytes = memory.mutate(&format!("{STEM}.dat0"));
+        let first_span = u16::from_le_bytes([bytes[0x82c], bytes[0x82d]]);
+        let second_span = u16::from_le_bytes([bytes[0x82e], bytes[0x82f]]);
+        put32(bytes, 0x814, 2);
+        put32(bytes, 0x81c, u32::from(first_span));
+        put32(bytes, 0x820, 64);
+        put32(bytes, 0x828, 1);
+        put32(bytes, 0x82c, 80 + u32::from(first_span));
+        put32(bytes, 0x830, u32::from(second_span));
+        put32(bytes, 0x834, 32);
+        put32(bytes, 0x838, 1);
+        put32(bytes, 0x83c, 1);
+        put16(bytes, 0x840, first_span);
+        put16(bytes, 0x842, second_span);
+        match mutation {
+            1 => put32(bytes, 0x838, 0),
+            2 => put32(bytes, 0x830, 1),
+            3 => put16(bytes, 0x842, 16),
+            _ => (),
+        }
+        let result = block_on(SqPack::new(memory).read(PATH));
+        if mutation == 0 {
+            assert_eq!(
+                result.unwrap(),
+                [&[0x42; 80][..], &[7; 64], &[9; 32]].concat()
+            );
+        } else {
+            assert!(matches!(result, Err(Error::InvalidData { .. })));
+        }
+    }
+}
+
+#[test]
 fn texture_entries_reject_inconsistent_tables_and_spans() {
     let header = [0x42u8; 80];
     let first = vec![7u8; 64];
@@ -674,6 +1363,8 @@ fn texture_entries_reject_inconsistent_tables_and_spans() {
         (0x814, u32::MAX, false),
         (0x808, 1, false),
         (0x820, 1, false),
+        (0x81c, 1, false),
+        (0x824, 1, false),
         (0x828, 0, false),
         (0x82c, 8, true),
     ] {

@@ -1,0 +1,12 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "ear_tail_fields": true,
+  "results_sha256": "e2d00a9148229a7a36863f81f14725b8c5fe3c3bc586925bb93edc60f9d8e44b",
+  "additional_attribute_queries": ["atr_mim", "atr_top", "atr_hrn", "atr_kam", "atr_sta", "atr_bak"],
+  "models": [
+    {"path": "chara/human/c0801/obj/tail/t0001/model/c0801t0001_til.mdl", "sha256": "a4e2d41b669c30c446eefdf4af40318631c84157b39d9bebe3ca212040dc51c5"},
+    {"path": "chara/human/c1801/obj/zear/z0001/model/c1801z0001_zer.mdl", "sha256": "a86bfc718df6925b261a34d10d36219c284348bfae4aedd1c9d0dc553b1d3b76"},
+    {"path": "chara/human/c0801/obj/face/f0001/model/c0801f0001_fac.mdl", "sha256": "b43b5b84c62c0f915eba46e75d7a009bc91b65a1c8f23406d754cacc59d0bd39"},
+    {"path": "chara/human/c1401/obj/face/f0001/model/c1401f0001_fac.mdl", "sha256": "58219b28834474a9d0c9ffefa00c62b0a606020ea87934bb1dbc2ff660b0fd38"}
+  ]
+}

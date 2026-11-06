@@ -1,0 +1,19 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "report_sha256": "d0c538c50cc4de5cc6978ef25ecac2b0a3686c2d2a6518f3249317be504b3e69",
+  "indexes": 59,
+  "selected_records": 1576273,
+  "volume_entries": 482,
+  "complete_entries": 209,
+  "incomplete_entries": 273,
+  "complete_packed_entries": 4,
+  "images_verified": 1940,
+  "pixels_verified": 2370564,
+  "packed_witness": {
+    "dat": "ffxiv/010000.win32.dat1", "offset": 967331456,
+    "sha256": "9d8313c8a34eb2ec5a78c15173f9ad36793164416679b26ccb3f7b81ba39e2b6",
+    "header_sha256": "c496af78f796feca81c53ba1d118061d092ca3fcafe946507fc3b89dbd9a89f1",
+    "rows_sha256": "6f589ef3df11d3c956d464c1088ba0c0790ca0b9d28542d01d6eca3b017db1d9"
+  }
+}

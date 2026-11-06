@@ -1,0 +1,8 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "report_sha256": "bf72dbf52de1c464b6243719e748bea7616575e33fe3d0de37c5ca8a5ac4f634",
+  "actual_selector_count": 8,
+  "root_only_controls": 5,
+  "pair_queries": 48
+}

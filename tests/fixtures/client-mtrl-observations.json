@@ -1,0 +1,36 @@
+{
+  "binary_sha256":"958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "source_mtrl_sha256":"5f1b027bf4e8b3d4a93f0c2a5aba7f5d6573d4e368b8d20ad7e38d2ed64f557e",
+  "controlled_mtrl_sha256":"8ade72343004e6e804718b11d3bbccaee06a46d97d076ec0e6757493559fc3dd",
+  "words_sha256":"f38a7828455ab40e7956c510d6b0c6a04eab494cc60401104baab9d85ba80d2c",
+  "controlled_rows_sha256":"7588cc77364f00914e7cdd81614dafc8ee430711703f111a8c54ad0a489c6a58",
+  "ranges":[
+    {"label":"registration","rva":"0x31b509","bytes":50,"sha256":"bb06b8174a58a3c8290392372f6fcac5b2f28be2cb11c230590c7f8cf1c29db6"},
+    {"label":"header_and_dataset","rva":"0x301290","bytes":262,"sha256":"f26591a553b3691ced7ed5ff018112e6014f12441ee95cb2f9dc678d4368d547"},
+    {"label":"color_declaration","rva":"0x42adf9","bytes":128,"sha256":"39daf8e1e5332192690a09fdf84f1a3093205ca8df4e48d692238d0841fd77bc"},
+    {"label":"legacy_dye","rva":"0x42b1bf","bytes":620,"sha256":"cef967388b7ff7a9f6acb8b0a494e12acf934a6f43849e269afeac8654216acd"},
+    {"label":"dye_consumer","rva":"0x42b730","bytes":547,"sha256":"60423b307f23e31ee70db1a09ff3742918f389414d886e094458fa0622efd5fa"},
+    {"label":"stm_load","rva":"0x426e15","bytes":85,"sha256":"ae71fd3ade17c8cac3d46935068273d8763c1b8b1c670fadb851da87977c9168"},
+    {"label":"legacy_color_conversion","rva":"0x42aef0","bytes":382,"sha256":"6cb3816ef36354ab47398dc70d28c4b4a6005ea8e1a884cfdddd32ab8912366f"},
+    {"label":"modern_color_copy","rva":"0x42b430","bytes":100,"sha256":"90ab6384c24801f484fbb49fa29c653483599b9b7a4e948ebf330927e624aed7"},
+    {"label":"stm_column_read","rva":"0x1883d40","bytes":251,"sha256":"bd40897e72e9cd41d249e6c6428e9240f43cec272ef64ec5708df4a40ecb17a4"},
+    {"label":"legacy_shader_registration","rva":"0x426c42","bytes":74,"sha256":"fe06f7a6de0706ecee8b42ab45ab2d2256e587580d43e5a3db87fa6373dc554e"}
+  ],
+  "anchors":[
+    {"rva":"0x42ae6a","hex":"4c8da700020000","meaning":"Legacy dye pointer is dataset plus 512"},
+    {"rva":"0x42b1bf","hex":"410fb70c24","meaning":"first Legacy u16 dye word"},
+    {"rva":"0x42b1d0","hex":"6683e11f66c1e805","meaning":"low five flags, remaining eleven template bits"},
+    {"rva":"0x42b403","hex":"410fb754241e","meaning":"last u16 dye word at offset 30"},
+    {"rva":"0x42b7af","hex":"b9ff070000","meaning":"canonical template mask 11 bits"},
+    {"rva":"0x42b7f7","hex":"c1e90b83e103","meaning":"canonical high-word channel bits"},
+    {"rva":"0x42b7fd","hex":"3b8c24e00000000f85db000000","meaning":"channel comparison gates row updates"},
+    {"rva":"0x42b844","hex":"448b43fc450fa3c4","meaning":"metadata flag index tests low-word flags"},
+    {"rva":"0x42b896","hex":"0fb74424606685c0750e6639442462750766394424647415","meaning":"specular result is stored unless all three half bit patterns are zero"},
+    {"rva":"0x1883d73","hex":"4183f803418bc20f4dc2","meaning":"column 3 onward selects scalar width constant"},
+    {"rva":"0x22dcfd0","hex":"03000000000000000100000000000000","meaning":"RGB/scalar component counts 3 and 1"},
+    {"rva":"0x426c7c","hex":"488983b8020000","meaning":"save characterlegacy shader handle in utility +0x2b8"},
+    {"rva":"0x42b750","hex":"488bb1c8000000","meaning":"material shader identity pointer used by consumer"},
+    {"rva":"0x42b777","hex":"488b88b8020000483bf1","meaning":"compare against utility legacy shader identity"},
+    {"rva":"0x42b828","hex":"483bf0be05000000480f45d9","meaning":"identity mismatch selects twelve-item table instead of five-item table"}
+  ]
+}

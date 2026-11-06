@@ -1,0 +1,10 @@
+{
+  "version":"2026.10.06.0000.0000","platform":"Win32",
+  "results_sha256":"912d1171c4b7ac0dd88371fe26a4eef28c279c7262b4bdc482a3950d0c32ab30",
+  "models":[
+    {"path":"chara/equipment/e0001/model/c0101e0001_top.mdl","sha256":"961c5b587b4ed5dd2c51d9ec57764b8761c4a0af57cf2202bb2247db9d47e26d"},
+    {"path":"chara/equipment/e0600/model/c0101e0600_top.mdl","sha256":"6491e675a2a14533e5c87e605d679e578394b14f6d71a2ca929794d1956e7104"},
+    {"path":"chara/equipment/e0001/model/c0101e0001_dwn.mdl","sha256":"ca8c8260f2c8960445d4bb4eb34d377056d6a1989892953fb67f35b18b4f7882"},
+    {"path":"chara/equipment/e0600/model/c0101e0600_dwn.mdl","sha256":"511198c6af4527959795932398606493115d31adce56a5bf094f165c7a3a8409"}
+  ]
+}

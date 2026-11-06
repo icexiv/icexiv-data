@@ -1,0 +1,73 @@
+{
+  "kind": "pinned-upstream-cpu-candidate-probes-not-production-generator",
+  "version": "2026.10.06.0000.0000",
+  "evidence_directory": "../icexiv-data-evidence/volume-generator-02",
+  "evidence_manifest_sha256": "4bf4bca194f49d236d5a76c07ce6c712a4b1f57fd44cf8d27f13e63e7abd0cae",
+  "archive_validation_sha256": "96d1a1c4e9a6c562b82e4790be1314ec92d083fb37a0d4762df2082e3b4ab613",
+  "witness_manifest_sha256": "05bc5c11712e1dc4efa01b7dff2aeef815df8903fa42b96dacdb3fb1276e8503",
+  "reports": [
+    {"file": "sources.json", "sha256": "42ea68346f85f32d776b6968871ed28d072162a087f76b92f87886c895abc1d0"},
+    {"file": "build-sources.json", "sha256": "5ebcba94f608e142aaaf0f1e031f6edfba5cd32b9fb69c0b47cfeb609df1fc89"},
+    {"file": "nuget-metadata.json", "sha256": "e74a0468a07d275e6c5cc9af8c3ac1147fde9466ffa3f1a76a838ac430983629"},
+    {"file": "build/identity.json", "sha256": "00d79f6b52b1e9120cf5e4b23293201b782bd1d76fdf72e9035686dc78242927"},
+    {"file": "build/mean-identity.json", "sha256": "7ec14661a0c1f8829b9a4d62fa94f46f39a5a99929ec84d3a44e7655b7bcd8f5"},
+    {"file": "build/phase-identity.json", "sha256": "9a7b346226d88b60cb820f34054015cf7eefe2fd5aba4e212279954c368d3882"},
+    {"file": "comparison.json", "sha256": "6ebeb167ba2436be533b7692f6d9990d5987f3ebf8ba990626ff8bb8196d5463"},
+    {"file": "coefficients.json", "sha256": "1500c4357d47f20c62f64ce9e852756119ffa1cf45eca8d7e596504d2333065b"},
+    {"file": "mean-probe.json", "sha256": "ae6f62a49071c1278db302bcca37bc9133e8d52188829ee23eb6a585df0f184d"},
+    {"file": "phase-probe.json", "sha256": "029524545c7a9d9040a0cb3c38ffd88474ab18dfbcfded0b5684920329b60e71"},
+    {"file": "verification.json", "sha256": "ce5231accc7ac97bb72bf45b557376cf070ebe67c3bf7f032622b436ac60afcd"}
+  ],
+  "upstream": {
+    "DirectXTex": {"revision": "c0cb97764379ebd20dbd2016c58965db85f5b307", "license": "MIT"},
+    "DirectXMath": {"revision": "ee612d379528a69d11df7dfb72f5e656e909376a", "license": "MIT"},
+    "DirectX-Headers": {"revision": "75edcf75f4c0942dd0d39e75fdc5c42ca6f285fd", "license": "MIT"},
+    "SAL": {"revision": "07b1f05c43023f6352f5479306f9a9673bf2f715", "license": "MIT"},
+    "modified": false,
+    "added_as_project_dependency": false
+  },
+  "native_sdk_binary_adopted": false,
+  "witnesses": ["sky_441", "sky_067", "sky_104", "sky_358"],
+  "captured_entries_verified": 4,
+  "captured_groups_verified": 24,
+  "original_api_comparison": {
+    "compared_bytes_per_variant": 4528,
+    "bgra_recursive_mismatches": 758,
+    "bgra_recursive_dither_flag_mismatches": 758,
+    "dither_flag_has_identical_observed_outputs": true,
+    "float_recursive_then_dither_mismatches": 725,
+    "float_recursive_then_dither_max_absolute_difference": 17
+  },
+  "equal_neighborhood_probe": {
+    "normalized_float_bits": ["0x3f47eff0", "0x3f47efef"],
+    "source_order_local_y_indices": [[1, 2, 3, 0], [0, 1, 2, 3]],
+    "dithered_B": [200, 199],
+    "matches_both_observations": true
+  },
+  "all_to_one_probe": {
+    "sky_067_B_bits": "0x3e48eadb",
+    "scaled_B_exact": "3357667365/67108864",
+    "distance_above_threshold": "127013/67108864",
+    "quantizer_input": 50.50189208984375,
+    "dithered_B": 51,
+    "complete_control_final_pixels_match": 2,
+    "intermediate_mips_validated": false
+  },
+  "sample_phase_adapter": {
+    "operation": "reflect odd rows before and after original dither",
+    "upstream_option": false,
+    "mip": 1,
+    "compared_bytes": 4096,
+    "mismatches": 0,
+    "production_origin_established": false
+  },
+  "dither_microprobe": {"B_channels": 112, "physical_x_phase_mismatches": 0, "sample_serpentine_phase_differences": 48},
+  "game_reads": 0,
+  "full_generator_validated": false,
+  "production_generator_identified": false,
+  "prefix_writer_identified": false,
+  "missing_coordinates_exported": false,
+  "six_level_reconstructed_short_entries": 0,
+  "missing_logical_bytes": 603624,
+  "provenance": "docs/provenance/volume-generator-oracle.md"
+}

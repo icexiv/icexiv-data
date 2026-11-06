@@ -1,0 +1,17 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "provenance": "docs/provenance/tex.md",
+  "samples": [
+    {"file":"tile_norm_array.tex","path":"chara/common/texture/tile_norm_array.tex","sha256":"27e1999d33100b88a322edf551e38510d0e805640dc0e4bc44cf23a244cd6e79","rows_sha256":"df2f2d60162187e301e001eaf9ad3364463268e424fd704b18dfcaf34406aaf5"},
+    {"file":"tile_orb_array.tex","path":"chara/common/texture/tile_orb_array.tex","sha256":"eebd7e12c4f0146ce71986b969418c917f4c248961c2f1ed8f19cd292851e4b8","rows_sha256":"2f65417d9f94a4737c249fce2cf13ff7685d72a4f064945ca2a5ed933e1291f1"},
+    {"file":"float-lut.tex","dat":"ffxiv/000000.win32.dat0","offset":55399680,"sha256":"40938b1942ac655e445822a9a7120a02dfdd84cb98c9516ad9c7d659e8c41822","rows_sha256":"ee0ef96d7064dac7dbe063849a7ae7c1c246f058695f45b0a1f8a1eb50aa9fc6"},
+    {"file":"volume-l8.tex","dat":"ffxiv/000000.win32.dat0","offset":24966656,"sha256":"4a4788918da8af582bc14ced70083085be99a1e14d1eac503cee61455d79d320","rows_sha256":"2d529b765bb546142899dfe7e7ef4b6b1de8209137b78dceb5d7172e25a0b860"},
+    {"file":"cube-rgba4.tex","dat":"ffxiv/000000.win32.dat0","offset":23470336,"sha256":"ef20bb4626254380d07d6c1eefea354d61041b3f3499a162b6d7172db88974a4","rows_sha256":"99f5530c3c7349824151752ceea38630ee9230ad4c5d9e1185914e7e17722620"},
+    {"file":"cube-bc7-mips.tex","dat":"ffxiv/020000.win32.dat0","offset":4945118080,"sha256":"17832f9b45fd036327ffbca08b3080970debb8fd46b4ad97fb43cff4a2c26d5c","rows_sha256":"c55857a00ed1f01172f6a103adc522abde2fdbbe4aec2e9650c64b7c7abaab01"},
+    {"file":"bg-array-bc7.tex","dat":"ffxiv/010000.win32.dat0","offset":2731593472,"sha256":"f33db8f36531a00307dc1b5cbd5d523de653befddb6281a1448be8e0ae08c4dd","rows_sha256":"afa70ae6ef4f86c5598b193c9511826b29c70cf45aaccd85f7eb61e2b2506060"},
+    {"file":"weapon_norm.tex","path":"chara/weapon/w2001/obj/body/b0102/texture/v01_w2001b0102_norm.tex","sha256":"2de2305677811fccce96772b4115b13e7f7d95c60349a7e09ce1f72c20440430","rows_sha256":"f8776844ecc75812e80f18ef6c6c663eacefc8d3a313af88baa7121a6ec6bf4d"},
+    {"file":"weapon_mask.tex","path":"chara/weapon/w2001/obj/body/b0102/texture/v01_w2001b0102_mask.tex","sha256":"f2fcc417cfc114df886192a81780a4b6b10c46a0ace66bee73afba1a98186681","rows_sha256":"7f5e529b4785f05d7239648fa8b97c25b7a9f02c3864fd0db62b7366b9c46ceb"},
+    {"file":"icon.tex","path":"ui/icon/062000/062101_hr1.tex","sha256":"3a1695d48ed35e57cab507a78a1e868dcf73e441ba329e8f424f9db3152869c5","rows_sha256":"b320592dbdb759be7f923c4f8af98fce44216e2a09d350e491c6fa923fb7feaf"}
+  ]
+}

@@ -1,0 +1,78 @@
+{
+  "schema": "pbd-context-matrix-static-v1",
+  "version": "2026.10.06.0000.0000",
+  "platform": "PE32+ AMD64",
+  "evidence_directory": "../icexiv-data-evidence/pbd-context-matrix-23",
+  "executable": {
+    "bytes": 51910400,
+    "sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+    "preferred_base": "0x140000000",
+    "executed_or_emulated": false
+  },
+  "source_va": "0x1402f25f3",
+  "window": {
+    "va": "0x14033a460",
+    "bytes": 868,
+    "sha256": "93864852c51c57060da63208280b3f2d8ce115231a8683f965b117227cfd6891"
+  },
+  "shared_budget": {
+    "prior_new_or_extended_entries": 3,
+    "additional_entries": 1,
+    "cumulative_entries": 4,
+    "entry_limit": 4,
+    "prior_unique_new_code_bytes": 4761,
+    "additional_unique_code_bytes": 868,
+    "cumulative_unique_new_code_bytes": 5629,
+    "new_code_byte_limit": 8192,
+    "seed_unique_bytes": 1304,
+    "all_unique_code_bytes": 6933,
+    "data_regions": 2,
+    "data_region_limit": 2,
+    "data_bytes": 20,
+    "data_byte_limit": 256,
+    "additional_data_regions": 0,
+    "reference_queries": 0,
+    "query_limit": 0
+  },
+  "independent_review": {
+    "file": "review/result.json",
+    "bytes": 323763,
+    "sha256": "dcffab31460c8915f0a42c621cff36b50da407f6389271e63a79fb97e1627aa6",
+    "replay": "python3 -B review/verify.py"
+  },
+  "matrix_access": {
+    "output_register": "rcx",
+    "input_registers": ["rdx", "r8"],
+    "byte_offsets_each_base": [0, 4, 8, 16, 20, 24, 32, 36, 40, 48, 52, 56],
+    "dword_accesses_each_base": 12,
+    "unique_accessed_bytes_each_base": 48,
+    "bounding_span_exclusive_each_base": 60,
+    "unaccessed_w_offsets_each_base": [12, 28, 44, 60],
+    "last_input_read_va": "0x14033a5f9",
+    "first_output_store_va": "0x14033a632",
+    "return_pointer": "entry RCX",
+    "internal_calls": 0,
+    "internal_jumps": 0,
+    "rip_relative_operands": 0
+  },
+  "ordinary_algebra": {
+    "convention": "four XYZ groups are columns of a 3x4 matrix; column-vector action",
+    "parameters": "RCX=O, RDX=L, R8=R",
+    "linear": "O_linear = R_linear * L_linear",
+    "translation": "O_t = R_linear * L_t + R_t",
+    "caller": "A[d] = D * F on the reviewed non-null result path",
+    "manual_output_components_reviewed": 12,
+    "mulss_sites_reviewed": 36,
+    "addss_sites_reviewed": 27,
+    "numeric_or_symbolic_native_evaluation": false
+  },
+  "boundaries": [
+    "The affine fourth row is mathematical notation, not a physical W-slot value or store.",
+    "W access statements are relative to each base; shifted matrix overlap can make an input W address coincide with another matrix's XYZ address.",
+    "All input matrix reads precede output matrix writes, subject to valid spans, no concurrent mutation and no destructive stack/control/shadow alias.",
+    "Scalar matrix accesses impose no 16-byte alignment; stack movaps saves/restores require ABI alignment.",
+    "The second linear column has a distinct term order; ordinary algebra does not establish reordered binary32 equivalence or MXCSR behavior.",
+    "Downstream 0x1402e9c10 internals and W consumption are unknown; complete source/target/bind spaces and the whole render goal remain unaccepted.",
+    "Shared entry and data-region counts are exhausted; remaining code bytes do not authorize another entry or new constant region."
+  ]
+}

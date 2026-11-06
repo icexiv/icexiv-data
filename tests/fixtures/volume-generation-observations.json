@@ -1,0 +1,101 @@
+{
+  "kind": "offline-storage-static-dataflow-and-pixel-model-observation",
+  "installation_version": "2026.10.06.0000.0000",
+  "platform": "Win32 DX11",
+  "executable": {
+    "bytes": 51910400,
+    "sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+    "preferred_image_base": "0x140000000"
+  },
+  "selected_manifest_sha256": "cc4beb7cdb5129ad49baec01eea107ab032be23fcad356563a1fb32684c828b3",
+  "reports": [
+    {
+      "path": "/tmp/opencode/volume-native-generation-01/creation-report.json",
+      "sha256": "204e0ba3880b512d85fa71ca3a8358e8d3eca11075bcb3e08670748c970a6141"
+    },
+    {
+      "path": "/tmp/opencode/volume-storage-semantics-01/derived/conclusions.json",
+      "sha256": "3cc9a36d30e0ad442047035390b90123b63d1da088214467a70922cf73ad9d46"
+    },
+    {
+      "path": "/tmp/opencode/volume-native-generation-01/storage-crosscheck.json",
+      "sha256": "8ae37def2b1f69a4ae36bbb8d7bfb955b6bb61e0a7cd689eda02322193651d93"
+    },
+    {
+      "path": "/tmp/opencode/volume-mip-lineage-01/summary.json",
+      "sha256": "2fb0d4589ecfc701f2da59f334023ed9f265528c5264b0daff9f26a6150aa37e"
+    },
+    {
+      "path": "/tmp/opencode/volume-mip-lineage-01/quantization-counterexamples.json",
+      "sha256": "d094dab77b64eb960638221c5f2556f2383e17b8b42215b5452a60753248e125"
+    },
+    {
+      "path": "/tmp/opencode/volume-mip-lineage-01/control-manifest.json",
+      "sha256": "58587f1cf503a49261ab5065df6ecd16d7e056a7f22c7678ecb429807ef365ea"
+    },
+    {
+      "path": "/tmp/opencode/volume-native-generation-01/lineage-crosscheck.json",
+      "sha256": "6be0ff39281454488da92e48df8bbfccc9de621b40a04d3129bef8d7e2366e40"
+    }
+  ],
+  "storage": {
+    "short_entries": 273,
+    "allocation_bytes": 1239936,
+    "interval_bytes_to_indexed_successors": 1272192,
+    "unused_bytes_within_allocation": 316347,
+    "unused_nonzero_bytes_within_allocation": 0,
+    "zero_type_records_between_allocations_and_successors": 4,
+    "deflate_blocks_exactly_consumed": 1338,
+    "raw_blocks_exactly_consumed": 720,
+    "missing_logical_bytes": 603624
+  },
+  "conditional_creation": {
+    "caller": "0x140305240",
+    "assumptions": [
+      "mode is the extracted 0/1 bit",
+      "non-null initial pixels",
+      "flags unchanged before initialization",
+      "base mip selection 0 for the displayed full six-level layouts"
+    ],
+    "texture_flags": ["0x05000804", "0x05001004"],
+    "usage": 1,
+    "bind_flags": 8,
+    "cpu_access_flags": 0,
+    "misc_flags": 0,
+    "auto_generate_mips_conditions_satisfied": false,
+    "short_entry_mode_combinations": 546
+  },
+  "replacement": {
+    "function_range": ["0x140306d60", "0x140306ff4"],
+    "command": 11,
+    "dispatch_target": "0x140234dd2",
+    "copy_call": "0x140234e6c",
+    "copy_kind": "CopySubresourceRegion with null source box"
+  },
+  "pixel_model": {
+    "kind": "sample-derived-numerical-hypothesis-not-production-oracle",
+    "unique_short_chains": 177,
+    "all_short_stored_lower_bgra_bytes": 529116,
+    "unique_short_stored_lower_bgra_bytes": 369948,
+    "integral_model": "direct-base periodic piecewise-linear cell integration",
+    "half_scale_axis_kernel_numerators": [1, 7, 7, 1],
+    "half_scale_axis_kernel_denominator": 16,
+    "stored_bytes_outside_exact_floor_ceil": 0,
+    "slice_alignment": "every stored slice compatible with corresponding logical prefix under the stated model; repeated layers leave ambiguities",
+    "quantizer": "4x4 Bayer, odd-row reversed x, z phase, exact ties-to-even",
+    "unique_bgr_channels": 277461,
+    "unique_bgr_exact_channels": 276980,
+    "unique_bgr_mismatched_channels": 481,
+    "mismatches_at_exact_threshold": 480,
+    "mismatches_off_exact_threshold": 1,
+    "max_absolute_byte_error": 1,
+    "same_neighborhood_and_phase_counterexample": "sky_441 mip 1: (1,0,1)=200 and (1,4,1)=199 in B/G/R",
+    "off_threshold_counterexample": "sky_067 mip 5 B: F=204927/4096, threshold=1/32, candidate=50, stored=51",
+    "complete_non_degenerate_controls": ["sky_104", "sky_358", "sky_372"],
+    "production_rule_established": false,
+    "recovered_missing_bytes": 0
+  },
+  "six_level_reconstructed_short_entries": 0,
+  "runtime_observation": false,
+  "provenance": "docs/provenance/volume-generation.md"
+}

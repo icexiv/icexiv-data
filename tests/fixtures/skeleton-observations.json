@@ -1,0 +1,13 @@
+{
+  "version":"2026.10.06.0000.0000",
+  "platform":"Win32",
+  "samples":[
+    {"path":"chara/human/c0101/skeleton/base/b0001/skl_c0101b0001.sklb","sha256":"a01a5c20a7d2dfd5cf19c03c94e483bce3840ada0614018a717d22ad97240820","rows_sha256":"7201b1378574a85781ba08555770d4ce07395196c2d98fc336ee8cbc5a879d4c"},
+    {"path":"chara/weapon/w2001/skeleton/base/b0001/skl_w2001b0001.sklb","sha256":"52ef7bbacdd0eb8a5a195808ea71c3df737b00f05bcfeb9de80223552a6cc014","rows_sha256":"bd1d44e6afe06da2b32bba8794d9b44145b93ae0cbcd784695003d3e891937c8"},
+    {"path":"chara/human/c0201/skeleton/base/b0001/skl_c0201b0001.sklb","sha256":"440b978804362e49b52ed055353509232d756a1dd6b3ae7b96e50606379be30c","rows_sha256":"9a9ef191d9d68710b88260d7e07c9c415266112b3a3e72213aa495a1519ecd66"},
+    {"path":"chara/human/c0901/skeleton/base/b0001/skl_c0901b0001.sklb","sha256":"c6fa1eb0b779ba2864ccd13702e3b97f661259d7c65873d106f864a89c904c1a","rows_sha256":"1d79e9170601a4aebc202bb5c7442a3e05761d96919156d0c601ed090042475e"},
+    {"path":"chara/human/c1801/skeleton/base/b0001/skl_c1801b0001.sklb","sha256":"5221cc74f04debca1becccaa2eb1219e68ffeb00149df0d2232e19d82473d1f4","rows_sha256":"8adfc7217d26189057aa3d31862ee92d2c7d048929b0aca2159d9dfa60fd9c92"},
+    {"path":"chara/monster/m0001/skeleton/base/b0001/skl_m0001b0001.sklb","sha256":"e655a95ea39530179e06d28f2761fe87028e7f9754ddecfd68c093ddb28b878e","rows_sha256":"255df0d72e8d6c2f6c67ba964ec67590ba1dc78d580d33a92c0d11ea8f5e4509"},
+    {"path":"chara/demihuman/d0001/skeleton/base/b0001/skl_d0001b0001.sklb","sha256":"0b2e720bad8b76590f270433d082a0cdcd45995303d701bf5fb77e51d4c53c48","rows_sha256":"ed86d1b8062a8c0c18a7517103fb6ffab875cd36ff90fc3fcf3a6d26c2cdf28a"}
+  ]
+}

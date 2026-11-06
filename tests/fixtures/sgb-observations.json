@@ -1,0 +1,24 @@
+{
+  "version":"2026.10.06.0000.0000",
+  "platform":"Win32",
+  "samples":[
+    {"path":"bgcommon/hou/indoor/general/0001/asset/fun_b0_m0001.sgb","sha256":"50df428795db02316466efb459042a766bab606bc3ae7324d663ff6c0393d80b","rows_sha256":"2b2e7e03b007197aad42528994d1fbdb99765e9b56f05dd65b86cbae702cab54"},
+    {"path":"bgcommon/hou/indoor/general/0010/asset/fun_b0_m0010.sgb","sha256":"63f0892eec4b157fe5507c01e9ffcee86085ca06c40a5f30192a86a2ba7376d9","rows_sha256":"31380e9ac220c5685d26cc055b7df5be83a6ae7d15672f0531045c2673665f51"},
+    {"path":"bgcommon/hou/indoor/general/1000/asset/fun_b0_m1000.sgb","sha256":"3be3a7d921e09655e6420676b01d486c4c06ef5bbdb042019b65fcb293abfb3c","rows_sha256":"5a316e62880428603e242637301d217564042fdb266ada4dc2a8a47bd774786e"},
+    {"path":"bgcommon/hou/outdoor/general/0001/asset/gar_b0_m0001.sgb","sha256":"793fba717876914836d81f9e52203e9b75c3414d552bf333e68f6ee9dec39a8f","rows_sha256":"1418992b979080546a8d2abc893548ecc5206f2b3cb7f156ac12f7f0e61244a0"},
+    {"path":"bgcommon/hou/indoor/general/0210/asset/fun_b0_m0210.sgb","sha256":"9c7fcca74ab8eaaad8ce64ca63b6e13dee318c88239c02bf7709e1ae0c5af4c3","rows_sha256":"85f164273d4e676cd87858f7908ded55868eafac8e2695ccf3cced310ae4371b"},
+    {"path":"bgcommon/hou/indoor/general/0220/asset/fun_b0_m0220.sgb","sha256":"430b8a7f815df00bee9daa8f74c4e7b22f5bf669e9fb1238780ac9a51807aa1a","rows_sha256":"92953fc3de8bb96a50f643bd1cb536ca22206077aa341cf4b2ff10cdded00777"},
+    {"path":"bgcommon/hou/indoor/general/0221/asset/fun_b0_m0221.sgb","sha256":"aee9f8c7b5599427e61a6fc52fd0aa4832d72f984ec146deb94af8bf6a8f361a","rows_sha256":"e97feb2bc217cc9d30524ae70e00c707413dfec26e6220ca2bdb189afcd47b8c"},
+    {"path":"bgcommon/hou/indoor/hol/0000/asset/hol_g0_m0000.sgb","sha256":"a7a34e5ac34a0172bdc8667efcc1c5e69a3b30d50008409425cbbdd60762db11","rows_sha256":"134f70c5aaea84b90d9d22ce96d65c5892243c596e78bf1c2c00715f9e09f4a6"},
+    {"path":"bgcommon/hou/outdoor/hana/0000/asset/han_f0_m0000.sgb","sha256":"1ddf9db8915f625263dca7f41dea87ca417f6adbee6102235a6632a522b504a2","rows_sha256":"795c5c57c11f19838721ed7626cdf5fd4d249a30584f9969473357a793132669"}
+  ],
+  "target_models":[
+    {"path":"bgcommon/hou/indoor/general/0001/bgparts/fun_b0_m0001.mdl","sha256":"0222db3177ac528816c16a32a85511eef0559e39dcd9b7c9d660d1586959769b","rows_sha256":"099b697e00818e23dfbdc6111b24b82cc671b56d6913a84d16acbbf627ca565d"},
+    {"path":"bgcommon/hou/indoor/general/0010/bgparts/fun_b0_m0010.mdl","sha256":"797e59f0050673b61eafe4d0f04944df6df6ddd87f2405af0f770ee899d7fbef","rows_sha256":"77f3668f2a5aae8b27685feb126235b77cc56880745142bd283d681b162346c7"},
+    {"path":"bgcommon/hou/indoor/general/0143/bgparts/fun_b0_m0143.mdl","sha256":"d7611a3fd7cb53a0d7f727ae1110794a6f905e0a822ed26a7e7207ae5d3bd49a","rows_sha256":"bb1821a8c092c36fd0548a26e69ff8652f682601214753816a6a40a0ef67b8fb"},
+    {"path":"bgcommon/hou/indoor/general/0144/bgparts/fun_b0_m0144.mdl","sha256":"be5a4b5867470d25906ed33c939c8e75c1c7ea0c91a86968e16aff2e29b06dea","rows_sha256":"f6eb222db5a23b8ddd84c7c20dde32536d731f8b31aea38ae2b7a1af3987a79e"},
+    {"path":"bgcommon/hou/indoor/general/0210/bgparts/fun_b0_m0210.mdl","sha256":"26a273857354472031fae77420eb68864e177fcd178f45d9ec05e1ac11e2182c","rows_sha256":"c16e4d3fb34334a90ec340e7804a2b826261e3e165fbc43c04b132b204bf38d0"},
+    {"path":"bgcommon/hou/indoor/general/1000/bgparts/fun_b0_m1000.mdl","sha256":"e30cd4ae3b9247cf185f406d4f49399be3f50577e97e757d17be99d6f5045867","rows_sha256":"874cb47299bea924aab5e2fa2cf2578547d2dc2bc75e23f875eab197f9ad582d"},
+    {"path":"bgcommon/hou/outdoor/general/0001/bgparts/gar_b0_m0001.mdl","sha256":"e11de6952ca63e98a731296cfe7847e6e17c8b39785f819d14af4970525a0aba","rows_sha256":"3856041b0d635a2b7b7c662466cb40fa62f8c0e57e36be31db1b3b69a1e09073"}
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32",
+  "report_sha256": "5895cfd295b30748d8b3719e4fb82660367661ca99729180871295055fd8d430",
+  "index": "ffxiv/040000.win32.index",
+  "index_table_sha256": "3570cbbd52654e524629b3e083669b6d844e5c251a88a9c655a988700abff051",
+  "index_records_scanned": 334633,
+  "first_blocks_examined": 196873,
+  "legacy_color_only_materials_verified": 322,
+  "legacy_color_rows_verified": 5152,
+  "legacy_half_values_above_one": 15543,
+  "legacy_dye_candidates": 0,
+  "limitations": "Complete record selection of this one character index, excluding synonym records and non-type-2/out-of-size candidates. Full material comparisons apply only to the 322 identified 512-byte-dataset materials. No actual 544-byte dye material or dye application claim."
+}

@@ -1,6 +1,9 @@
 //! Borrowed EXD pages, typed fields and compound (parent/subrow) IDs.
 
-use super::{ColumnType, Error, Exh, Result, Variant, read, slice, table_end};
+use super::{
+    ColumnType, Error, Exh, Limits, Result, Variant, read, reserve, slice, sort_work, spend,
+    table_end,
+};
 use binrw::{BinRead, Endian};
 
 #[derive(BinRead)]
@@ -9,7 +12,8 @@ struct HeaderRaw {
     version: u16,
     _unknown: u16,
     index_size: u32,
-    _reserved: [u8; 20],
+    data_size: u32,
+    _reserved: [u8; 16],
 }
 
 #[derive(BinRead)]
@@ -40,10 +44,21 @@ pub struct Exd<'data, 'header> {
     header: &'header Exh,
     index: Vec<RowIndex>,
     row_count: usize,
+    max_string_bytes: usize,
 }
 
 impl<'data, 'header> Exd<'data, 'header> {
     pub fn parse(bytes: &'data [u8], header: &'header Exh) -> Result<Self> {
+        Self::parse_with_limits(bytes, header, Limits::default())
+    }
+    pub fn parse_with_limits(
+        bytes: &'data [u8],
+        header: &'header Exh,
+        limits: Limits,
+    ) -> Result<Self> {
+        if bytes.len() > limits.max_input_bytes {
+            return Err(Error::BudgetExceeded("EXD input"));
+        }
         let raw: HeaderRaw = read(bytes, Endian::Big)?;
         if raw.version != 2 {
             return Err(Error::UnsupportedVersion {
@@ -57,10 +72,19 @@ impl<'data, 'header> Exd<'data, 'header> {
             return Err(Error::InvalidData("partial row index record"));
         }
         let data_start = table_end(bytes, 32, index_size / 8, 8)?;
-        let mut index = Vec::new();
-        index
-            .try_reserve_exact(index_size / 8)
-            .map_err(|_| Error::AllocationFailed)?;
+        let data_size = usize::try_from(raw.data_size)
+            .map_err(|_| Error::InvalidData("data section size overflow"))?;
+        if data_start.checked_add(data_size) != Some(bytes.len()) {
+            return Err(Error::InvalidData("EXD data section size"));
+        }
+        let parents = index_size / 8;
+        if parents > limits.max_parent_rows {
+            return Err(Error::BudgetExceeded("parent rows"));
+        }
+        let mut allocation = limits.max_metadata_bytes;
+        let mut work = limits.max_work;
+        spend(&mut work, parents, "row indexes")?;
+        let mut index = reserve(parents, &mut allocation)?;
         let mut row_count = 0usize;
         for record in bytes[32..data_start].as_chunks::<8>().0 {
             let record: IndexRaw = read(record, Endian::Big)?;
@@ -89,6 +113,11 @@ impl<'data, 'header> Exd<'data, 'header> {
                         .checked_add(2)
                         .ok_or(Error::InvalidData("subrow stride overflow"))?;
                     let fixed_end = table_end(payload, 0, usize::from(row.subrows), stride)?;
+                    spend(
+                        &mut work,
+                        1024usize + usize::from(row.subrows),
+                        "subrow validation",
+                    )?;
                     // ID values need not equal physical positions or be contiguous.
                     let mut seen = [0u64; 1024];
                     for subrow in payload[..fixed_end].chunks_exact(stride) {
@@ -108,6 +137,9 @@ impl<'data, 'header> Exd<'data, 'header> {
             row_count = row_count
                 .checked_add(usize::from(row.subrows))
                 .ok_or(Error::InvalidData("row count overflow"))?;
+            if row_count > limits.max_rows {
+                return Err(Error::BudgetExceeded("decoded rows"));
+            }
             index.push(RowIndex {
                 id: record.id,
                 offset,
@@ -116,6 +148,13 @@ impl<'data, 'header> Exd<'data, 'header> {
             });
         }
         // Reject aliases/overlaps without assuming the input index is sorted.
+        spend(
+            &mut work,
+            sort_work(index.len())?
+                .checked_mul(2)
+                .ok_or(Error::InvalidData("row sorting work overflow"))?,
+            "row sorting",
+        )?;
         index.sort_unstable_by_key(|row| row.offset);
         if index.windows(2).any(|pair| pair[0].end > pair[1].offset) {
             return Err(Error::InvalidData("overlapping row records"));
@@ -129,6 +168,7 @@ impl<'data, 'header> Exd<'data, 'header> {
             header,
             index,
             row_count,
+            max_string_bytes: limits.max_string_bytes,
         })
     }
 
@@ -201,8 +241,8 @@ impl<'data, 'header> Exd<'data, 'header> {
             subrow_id,
             header: self.header,
             fixed: &self.bytes[start..end],
-            tail: &self.bytes[end..row.end],
-            minimum_string_offset: pool_start - end,
+            strings: &self.bytes[pool_start..row.end],
+            max_string_bytes: self.max_string_bytes,
         }
     }
 }
@@ -214,8 +254,8 @@ pub struct Row<'data, 'header> {
     subrow_id: Option<u16>,
     header: &'header Exh,
     fixed: &'data [u8],
-    tail: &'data [u8],
-    minimum_string_offset: usize,
+    strings: &'data [u8],
+    max_string_bytes: usize,
 }
 
 #[derive(Clone, Copy, Debug, PartialEq)]
@@ -264,17 +304,18 @@ impl<'data> Row<'data, '_> {
             ColumnType::String => {
                 let offset = usize::try_from(read::<u32>(bytes, Endian::Big)?)
                     .map_err(|_| Error::InvalidData("string offset overflow"))?;
-                if offset < self.minimum_string_offset {
-                    return Err(Error::InvalidData("string points into subrow fixed data"));
-                }
                 let tail = self
-                    .tail
+                    .strings
                     .get(offset..)
                     .ok_or(Error::InvalidData("string offset exceeds parent row"))?;
-                let end = tail
-                    .iter()
-                    .position(|&byte| byte == 0)
-                    .ok_or(Error::InvalidData("unterminated row string"))?;
+                let cap = tail.len().min(self.max_string_bytes.saturating_add(1));
+                let end = tail[..cap].iter().position(|&byte| byte == 0).ok_or(
+                    if tail.len() > self.max_string_bytes {
+                        Error::BudgetExceeded("string length")
+                    } else {
+                        Error::InvalidData("unterminated row string")
+                    },
+                )?;
                 Value::String(&tail[..end])
             }
             ColumnType::Bool => Value::Bool(read::<u8>(bytes, Endian::Big)? != 0),

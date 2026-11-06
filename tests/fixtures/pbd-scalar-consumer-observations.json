@@ -1,0 +1,26 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "platform": "Win32 SHPK / Win64 executable",
+  "binary_sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "token_header_commit": "ea3489109cc8a968b36e36ca20a698a68b516d32",
+  "token_header_sha256": "cf808b363406fce9387d7ec8daec19940175af966589c0d3e084a4c41c3f5060",
+  "token_license_sha256": "27a49e35d1da96eba18fba54bc882667ff0ff8c0254f16f2b6e165d605ba7df8",
+  "native_report_sha256": "78974904dd9d3941814632e08b170a74e9737de57abba1364e051f8d9afef927",
+  "shader_report_sha256": "b59828af01757f578e109bf29574ae6533503d073160cc2edfa020b550ef394a",
+  "native_ranges": 15,
+  "native_direct_edges": 14,
+  "native_rip_references": 9,
+  "native_anchors": 20,
+  "shpk_files": 7,
+  "shader_resource_records_checked": 8589,
+  "vertex_shaders_with_model_parameter": 316,
+  "adjacent_wetness_chains": 316,
+  "direct_position0_y_inputs": 252,
+  "temporary_r0_y_inputs": 64,
+  "direct_texcoord4_w_outputs": 140,
+  "witnesses": [
+    {"shpk":"character.shpk","vertex_shader_index":2,"dxbc_offset":"0x45495c","dxbc_sha256":"cd16bc141dab52cac8d269f73be4d1e61cf8b340e41ed5c548a7ea252d4f8dd6"},
+    {"shpk":"character.shpk","vertex_shader_index":48,"dxbc_offset":"0x4aa880","dxbc_sha256":"cd65f2a45d9f5a78af4ea95e537fd7ea3d47163ea92a63d59dff311ebaff5401"}
+  ],
+  "limitations": "Native byte/name/packet dataflow and shader reflection/token observations; no draw selection, driver binding, shader execution, scalar physical unit, full indirect fanout or complete PBD transform/EPBD semantics."
+}

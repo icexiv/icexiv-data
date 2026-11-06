@@ -1,0 +1,34 @@
+{
+  "version": "2026.10.06.0000.0000",
+  "report_sha256": "9d1e742828394ac4e7ad49a1c7986b5d6ebc610b84252897f68b781d33ec46e4",
+  "binary_sha256": "958b78e278ad896493c484eb313ff605ab41edefef74f92b0ee078e69b281bf9",
+  "ranges": [
+    {"label":"declaration_conversion","rva":"0x3207e0","bytes":648,"sha256":"224cd6d8b274a6d74221e0bd2cbe06a9831da6680e934db9819c2f070ff24fb9"},
+    {"label":"declaration_forward","rva":"0x2261f0","bytes":9,"sha256":"81d5814fbfdddf46ee6e4779001dd14adde9ce086be30452644775690b81998c"},
+    {"label":"declaration_cache","rva":"0x236000","bytes":672,"sha256":"d31ab9664fa33884729002ce88ac5c9de4004cfabd138f3361f02b2f3665789c"},
+    {"label":"semantic_names","rva":"0x21c290","bytes":444,"sha256":"7d64b21b622a7f2bc7a535f7620da304687ab3aea04bae02ee2433949257aaf3"},
+    {"label":"input_descriptors","rva":"0x21c480","bytes":720,"sha256":"21d439789b440a05d1ff08e4f0188bfb7ed0060f6a823d091846a6a378900a31"}
+  ],
+  "usage_branch_targets": ["0x320940","0x320947","0x32094e","0x320955","0x32095c","0x320962","0x320969","0x320970"],
+  "internal_semantics": [["POSITION",0],["BLENDWEIGHT",0],["NORMAL",0],["COLOR",0],["COLOR",1],["FOG",0],["PSIZE",0],["BLENDINDICES",0],["TEXCOORD",0],["TEXCOORD",1],["TEXCOORD",2],["TEXCOORD",3],["TEXCOORD",4],["TEXCOORD",5],["TANGENT",0],["BINORMAL",0],["DEPTH",0]],
+  "anchors": [
+    {"rva":"0x320929","hex":"410fb6400383f807","meaning":"read raw declaration usage at +3, bound eight cases"},
+    {"rva":"0x320962","hex":"c64415a30e","meaning":"raw usage 5 writes internal semantic 14"},
+    {"rva":"0x320969","hex":"c64415a30f","meaning":"raw usage 6 writes internal semantic 15"},
+    {"rva":"0x3208a4","hex":"450fb65004","meaning":"read raw usage-index at +4"},
+    {"rva":"0x32095c","hex":"4180c208","meaning":"UV adds usage-index to internal TEXCOORD0 base 8"},
+    {"rva":"0x320970","hex":"4180c203","meaning":"color adds usage-index to internal COLOR0 base 3"},
+    {"rva":"0x320998","hex":"e85358f0ff","meaning":"pass converted four-byte elements to declaration factory"},
+    {"rva":"0x21c501","hex":"0fb64b03","meaning":"descriptor builder reads converted semantic at +3"},
+    {"rva":"0x21c50d","hex":"e87efdffff","meaning":"descriptor builder calls semantic name/index lookup"}
+  ],
+  "shaders": [
+    {"file":"character.shpk","sha256":"c2453552ce2527f1f92a9f62d04d2c5fbed67226306629826edc0c1d9c646abe"},
+    {"file":"characterlegacy.shpk","sha256":"5f95ae36f1cfbf603f85817d6872190a56ddd323fb44ade17779bbaf3a28049e"},
+    {"file":"skin.shpk","sha256":"4e2f77df0399de59af5e6383358cb7d071ca0c7734f2e161504b086239593e57"},
+    {"file":"bgcrestchange.shpk","sha256":"fa60e4f6a706c5ee0ff9190d9740248d8fc1802df0bfcb572049a6af5e6ad3d6"},
+    {"file":"water.shpk","sha256":"40b749201ceea5332d60500ea37df61bae43372f8db55f23982ac5c5dbfe69fd"},
+    {"file":"bg.shpk","sha256":"9617282ff8a947ceecd11846a73fc1d5ec7782cf19fe22ec363cc6d3195375be"},
+    {"file":"hair.shpk","sha256":"ed0c9953e6aa6db7822a205e051c0628e2ad31bd87fb38e6b28ff042570a015f"}
+  ]
+}

@@ -1,0 +1,27 @@
+{
+  "DirectXTex": {
+    "repository": "https://github.com/microsoft/DirectXTex",
+    "commit": "c0cb97764379ebd20dbd2016c58965db85f5b307",
+    "files": {
+      "LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383",
+      "DirectXTex/BC6HBC7.cpp": "790e554a8e95bad5b6e7bd3824a829fb97601d768660c05a090f9027e3517f56",
+      "DirectXTex/BC.h": "3193deb3bc7b81695fa354daa1c54e98330e09cf4679e8472b051281bcee565e",
+      "DirectXTex/DirectXTex.h": "7637b6966b7644da850365e0dc66c2ba57ba72cb7f4526ff4e37b5e279459b1c"
+    }
+  },
+  "DirectXMath": {
+    "repository": "https://github.com/microsoft/DirectXMath",
+    "commit": "ee612d379528a69d11df7dfb72f5e656e909376a",
+    "files": {"LICENSE": "c2cfccb812fe482101a8f04597dfc5a9991a6b2748266c47ac91b6a5aae15383"},
+    "inc_sha256": "89c24eed9ce34075aaeb3ec862c731d5fd83a75408acb33dd9a8b1ed9b67139f"
+  },
+  "SAL": {
+    "repository": "https://github.com/dotnet/runtime",
+    "commit": "07b1f05c43023f6352f5479306f9a9673bf2f715",
+    "original_header": "src/coreclr/pal/inc/rt/sal.h",
+    "files": {
+      "LICENSE.TXT": "cfc21f5e8bd655ae997eec916138b707b1d290b83272c02a95c9f821b8c87310",
+      "sal.h": "e26ee611231a859b5a800eb2e1606e7ca03b8e3981d7c98cf1ca20c89b658b68"
+    }
+  }
+}
