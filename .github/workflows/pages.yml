@@ -21,12 +21,12 @@ jobs:
       - uses: actions/checkout@v4
       - uses: cachix/install-nix-action@v31
       - name: Build documentation
-        run: nix develop --no-update-lock-file -c notist build
+        run: nix develop --no-update-lock-file --max-jobs 1 --cores 2 -c notist build
       - name: Upload Pages artifact
         if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@v3
         with:
-          path: dist/icexiv-data-book
+          path: notist-output/icexiv-data
 
   deploy:
     name: Deploy GitHub Pages

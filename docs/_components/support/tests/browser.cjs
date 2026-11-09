@@ -6,7 +6,7 @@ const path = require("node:path");
 const { chromium } = require(process.env.NOTIST_PLAYWRIGHT ?? "playwright");
 
 (async () => {
-  const root = path.resolve("dist/icexiv-data-book");
+  const root = path.resolve("notist-output/icexiv-data");
   const browser = await chromium.launch({ headless: true,
     ...(process.env.NOTIST_CHROMIUM ? { executablePath: process.env.NOTIST_CHROMIUM } : {}) });
   try {

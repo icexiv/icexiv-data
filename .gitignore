@@ -1,6 +1,7 @@
 /target/
 /.direnv/
 /dist/
+/notist-output/
 /result
 /result-*
 /.reference/

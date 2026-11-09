@@ -65,11 +65,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1793616432,
-        "narHash": "sha256-GZm95JVnh0nE9efQEyk5A/ABoTUEsSwrYQuzLDLG6f4=",
+        "lastModified": 1794231561,
+        "narHash": "sha256-xfHix5nCOSf6HrxgPyb0fs4KZY3bQGzrlxe7BBkmR1o=",
         "owner": "AzurIce",
         "repo": "notist",
-        "rev": "24687678fd54125ae017344813ca3192aee87ef1",
+        "rev": "3d17013b60a01a7e53e68bd076540494f4c5549a",
         "type": "github"
       },
       "original": {

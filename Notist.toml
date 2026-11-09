@@ -1,10 +1,16 @@
-[project]
+[package]
 name = "icexiv-data"
 
-[[book]]
+[site]
 title = "IceXIV Data"
-root = "docs"
+content = "docs"
+theme = "builtins.book"
+directory_urls = true
+copy_content_assets = false
 exclude = ["**/AGENTS.md"]
+
+[site.extensions.builtins.book]
+select = true
 
 [[extensions]]
 kind = "replace"
