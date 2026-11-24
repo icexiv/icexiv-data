@@ -1,4 +1,4 @@
-//! Checked, byte-only parsing of little-endian MDL models (version 0x01000006).
+//! Checked, byte-only parsing of little-endian MDL models (0x01000005 and 0x01000006).
 //!
 //! Parsing borrows metadata and buffers without allocating. Mesh views expose
 //! raw declarations, scalar vertex conversion, checked u16 indices, submeshes,
@@ -356,7 +356,7 @@ impl<'a> Mdl<'a> {
         }
         let h = span(bytes, 0, 68)?;
         let version = u32_at(h, 0)?;
-        if version != 0x0100_0006 {
+        if !matches!(version, 0x0100_0005 | 0x0100_0006) {
             return Err(Error::UnsupportedVersion(version));
         }
         let file = FileHeader {
@@ -419,8 +419,9 @@ impl<'a> Mdl<'a> {
         let materials = r.take(count(10)?, 4)?;
         let bones = r.take(count(12)?, 4)?;
         let bone_start = r.pos;
-        let bone_tables = r.take(count(14)?, 4)?;
-        let bone_pool = r.take(count(44)?, 2)?;
+        let fixed = version == 0x0100_0005;
+        let bone_tables = r.take(count(14)?, if fixed { 132 } else { 4 })?;
+        let bone_pool = r.take(if fixed { 0 } else { count(44)? }, 2)?;
         let bone_data = span(runtime, bone_start, bone_tables.len() + bone_pool.len())?;
         let shapes = r.take(count(16)?, 16)?;
         let shape_meshes = r.take(count(18)?, 12)?;
@@ -610,7 +611,14 @@ impl<'a> Mdl<'a> {
         self.bones.len() / 4
     }
     pub fn bone_table_count(&self) -> usize {
-        self.bone_tables.len() / 4
+        self.bone_tables.len() / self.palette_stride()
+    }
+    fn palette_stride(&self) -> usize {
+        if self.file.version == 0x0100_0005 {
+            132
+        } else {
+            4
+        }
     }
     pub fn shape_count(&self) -> usize {
         self.shapes.len() / 16
@@ -776,16 +784,21 @@ impl<'a> Mdl<'a> {
         })
     }
     pub fn bone_table(&self, index: usize) -> Result<impl ExactSizeIterator<Item = u16> + 'a> {
-        let b = record(self.bone_tables, index, 4)?;
-        let offset = usize::from(u16_at(b, 0)?) * 4;
-        let start = index
-            .checked_mul(4)
-            .and_then(|base| base.checked_add(offset))
-            .ok_or(Error::InvalidData("bone table offset overflow"))?;
-        if start < self.bone_tables.len() {
-            return Err(Error::InvalidData("bone palette overlaps descriptors"));
-        }
-        let data = span(self.bone_data, start, usize::from(u16_at(b, 2)?) * 2)?;
+        let b = record(self.bone_tables, index, self.palette_stride())?;
+        let data = if self.file.version == 0x0100_0005 {
+            let count = usize::from(b[128]);
+            span(&b[..128], 0, count * 2)?
+        } else {
+            let offset = usize::from(u16_at(b, 0)?) * 4;
+            let start = index
+                .checked_mul(4)
+                .and_then(|base| base.checked_add(offset))
+                .ok_or(Error::InvalidData("bone table offset overflow"))?;
+            if start < self.bone_tables.len() {
+                return Err(Error::InvalidData("bone palette overlaps descriptors"));
+            }
+            span(self.bone_data, start, usize::from(u16_at(b, 2)?) * 2)?
+        };
         Ok(data
             .chunks_exact(2)
             .map(|b| u16::from_le_bytes([b[0], b[1]])))

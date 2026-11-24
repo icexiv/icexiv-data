@@ -169,6 +169,30 @@ fn fixture() -> Fixture {
 }
 
 #[test]
+fn fixed_palette_model_keeps_following_sections_aligned() {
+    let mut f = fixture();
+    let mut palette = [0; 132];
+    palette[128] = 1;
+    f.bytes.splice(f.palettes..f.palettes + 8, palette);
+    put32(&mut f.bytes, 0, 0x0100_0005);
+    for p in [
+        8,
+        16,
+        28,
+        f.model_header + 56 + 32 + 52,
+        f.model_header + 56 + 32 + 56,
+    ] {
+        let old = u32::from_le_bytes(f.bytes[p..p + 4].try_into().unwrap());
+        put32(&mut f.bytes, p, old + 124);
+    }
+    let m = Mdl::parse(&f.bytes).unwrap();
+    assert_eq!(m.bone_table(0).unwrap().collect::<Vec<_>>(), [0]);
+    assert_eq!(m.submesh_bone(1).unwrap(), 0);
+    f.bytes[f.palettes + 128] = 65;
+    assert!(Mdl::parse(&f.bytes).is_err());
+}
+
+#[test]
 fn attribute_name_lookup_is_budgeted_local_and_checked_at_32_bits() {
     fn model(names: &[&[u8]]) -> Vec<u8> {
         let mut b = vec![0; 68];
