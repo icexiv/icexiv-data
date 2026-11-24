@@ -54,9 +54,9 @@ in [EQP evidence](docs/provenance/eqp.md).
 
 ## MDL geometry
 
-`mdl::Mdl` reads extracted Win32 version `0x01000006` without I/O or metadata
+`mdl::Mdl` reads extracted Win32 versions `0x01000005` and `0x01000006` without I/O or metadata
 allocation. It exposes LOD roles, material/attribute/bone names, submeshes,
-variable bone palettes, ElementId records, bounds, shape replacements and
+fixed and variable bone palettes, ElementId records, bounds, shape replacements and
 declaration-driven vertex/index access:
 
 ```rust
