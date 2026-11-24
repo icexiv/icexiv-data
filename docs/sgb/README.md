@@ -1,4 +1,4 @@
-#import "../_components/pele/lib.notc" as pele;
+#import "../_components/pele/lib.not" as pele;
 
 # SGB 共享场景与家具依赖
 

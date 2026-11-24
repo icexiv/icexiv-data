@@ -1,4 +1,4 @@
-#import "_components/support/lib.notc" as support;
+#import "_components/support/lib.not" as support;
 
 # 格式支持总览
 

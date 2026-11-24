@@ -1,4 +1,4 @@
-#import "../_components/pele/lib.notc" as pele;
+#import "../_components/pele/lib.not" as pele;
 
 # index、index2 与 DAT
 

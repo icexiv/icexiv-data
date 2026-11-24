@@ -1,7 +1,7 @@
-#import "pele/lib.notc" as pele;
-#import "typst/lib.notc" as typst;
+#import "pele/lib.not" as pele;
+#import "typst/lib.not" as typst;
 
-= Documentation components
+# Documentation components
 
 The book keeps the Pele diagram and Typst math components under
 `do`. They are copies of the Notist modules used by Icy Bot, so
@@ -32,7 +32,7 @@ $x^2 + y^2 = z^2$.
 
 A block formula can select the result type explicitly:
 
-#typst.math<BlockContent>("sum_(i=1)^n i = frac(n(n+1), 2)")
+#typst.math_block("sum_(i=1)^n i = frac(n(n+1), 2)")
 
 The full Typst entry point is also available for arbitrary markup:
 

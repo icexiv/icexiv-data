@@ -1,6 +1,6 @@
-= 格式支持目录组件
+# 格式支持目录组件
 
-`lib.notc` 的 `catalog(source: String)` 接收 JSON 分组数组，输出可筛选的
+`lib.not` 的 `catalog(source: String)` 接收 JSON 分组数组，输出可筛选的
 双列卡片。窄屏自动单列；每张卡片通过原生 details 展开限制，状态同时以
 文字和颜色表达。颜色继承书籍主题变量，内容在 Shadow DOM 内隔离。
 

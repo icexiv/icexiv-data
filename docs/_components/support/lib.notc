@@ -1,1 +1,0 @@
-fn catalog(source: String) -> BlockContent;

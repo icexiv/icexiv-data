@@ -8,12 +8,7 @@ theme = "builtins.book"
 directory_urls = true
 copy_content_assets = false
 exclude = ["**/AGENTS.md"]
+math_component = "docs/_components/typst/math"
 
 [site.extensions.builtins.book]
 select = true
-
-[[extensions]]
-kind = "replace"
-imports = { typst = "docs/_components/typst/lib.notc" }
-from = "notist.math"
-to = "typst.math"

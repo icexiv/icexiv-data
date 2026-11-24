@@ -82,4 +82,4 @@
 
 ---
 
-- [Notist components](_components/README.not)
+- [Notist components](_components/README.md)
