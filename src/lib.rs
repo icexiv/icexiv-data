@@ -1,13 +1,16 @@
 //! Backend-independent FFXIV data library.
 
+pub mod amb;
 pub mod avfx;
 mod binary;
 pub mod cmp;
+pub mod envb;
 pub mod eqdp;
 pub mod eqp;
 pub mod excel;
 pub mod havok;
 pub mod imc;
+pub mod lvb;
 pub mod mdl;
 pub mod mtrl;
 pub mod pap;

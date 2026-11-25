@@ -24,13 +24,14 @@
     {"name":"STM","status":"ready","route":"stm/","summary":"Legacy/Dawntrail 染色模板与 stain 查询。","limit":"提供 half/f32 输出；额外历史索引表示缺输入证据。"},
     {"name":"TEX","status":"partial","route":"tex/","summary":"2D、array、cube、volume 的 mip 解码。","limit":"整数、BC1–7 支持 RGBA8；七种非压缩浮点及 BC6H 支持非截断 RGBA32F。短 volume 可读完整 base mip，但不能补齐整文件；不支持 tiled/swizzled。"},
     {"name":"ATEX","status":"ready","route":"atex/","summary":"复用 TEX 的纹理解析与像素解码。","limit":"实样本含 cube/mip；float/array/volume 缺 ATEX 实样本验证。"},
-    {"name":"AMB","status":"reference","route":"amb/","summary":"环境系数、相位与目录的格式研究。","limit":"有格式参考和静态消费证据，没有公共解析接口。"}
+    {"name":"AMB","status":"partial","route":"amb/","summary":"版本 1 variant 1 的组目录、三通道九槽系数与相位查询。","limit":"不选天气或时间，不评价球谐，不做颜色空间转换；其他版本与 variant 需样本。"}
   ]},
   {"title":"骨架与动画","items":[
     {"name":"SKLB / Havok","status":"ready","route":"sklb/","summary":"骨名、父索引与本地 rest TRS。","limit":"SKLB 1200/1300、tagfile v3。其他版本不支持；辅助区语义不完整。"},
     {"name":"PBD / EPBD","status":"partial","route":"pbd/","summary":"种族关系、骨矩阵、祖先路径与仿射数学。","limit":"矩阵可读，不等于完整变形规则已确认；source/target/bind 空间与 EPBD 选择规则缺证据。"},
     {"name":"CMP","status":"ready","route":"cmp/","summary":"外观色区、体型范围与百分比插值。","limit":"限八种族 human.cmp 布局；不计算姿态或 NPC 回退。"},
-    {"name":"PAP","status":"partial","route":"pap/","summary":"动画 binding、轨道映射与 spline 采样。","limit":"Win32 0x00020001，transform spline 毫秒采样；不支持 float tracks，不组合 blendHint。"}
+    {"name":"PAP","status":"partial","route":"pap/","summary":"动画 binding、轨道映射、spline 采样与骨架空间挂点。","limit":"Win32 0x00020001，transform spline 毫秒采样；不支持 float tracks，不组合 blendHint。"},
+    {"name":"TMB","status":"partial","route":"tmb/","summary":"actor/track 引用、动画名、子时间线和特效命令。","limit":"C012 的目标、变换、颜色和可见性可读；条件轨道与命令生命周期由播放器处理。"}
   ]},
   {"title":"特效资产","items":[
     {"name":"AVFX","status":"ready","route":"avfx/","summary":"节点、曲线、纹理、内嵌几何与 Binder。","limit":"限六类节点及已验证的 31 种 Data 组合；不模拟特效或合成宿主姿态。"}
@@ -38,7 +39,8 @@
 ]
 """#)
 
-验证基准：Win32 `2026.10.06.0000.0000`。支持以卡片所列能力为准，
+验证基准包括 Win32 `2026.10.06.0000.0000` 的格式样本，以及 `2026.11.03.0000.0000`
+的动作时间线与 Binder 消费路径。支持以卡片所列能力为准，
 不穷尽历史变体。GPU 渲染、角色装配与 VFX 模拟不在本次范围内。
 
 [详细覆盖与缺口](requirements-coverage.md) · [来源与验证](provenance/README.md)
