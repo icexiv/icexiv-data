@@ -9,7 +9,15 @@ pub use assets::{
     Reference, ReferenceKind, ReferenceStatus, TextureSlot,
 };
 mod binder;
-pub use binder::{BinderProperty, BinderSlot, RingParameters};
+mod rgb;
+pub use rgb::RgbCurve;
+mod random;
+pub use random::{CurveRng, RandomAmplitude, RandomAmplitudeInstance};
+mod scalar;
+pub use binder::{
+    BinderHostFrame, BinderProperty, BinderSlot, BinderTransformFlags, RingParameters,
+};
+pub use scalar::ScalarCurve;
 pub type Result<T> = std::result::Result<T, Error>;
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum Error {
