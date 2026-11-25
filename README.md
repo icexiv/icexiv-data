@@ -131,7 +131,16 @@ reference policies remain outside the verified subset.
 BPID, raw names, ring values and position groups without choosing a host or
 defaulting missing values. BPID is not a skeleton bone-array index. Static
 owner ElementId/parent-bone correspondences are documented in
-[weapon binder evidence](docs/provenance/binder.md); no pose is composed.
+[weapon binder evidence](docs/provenance/binder.md).
+`binder_transform_flags()?.host_frame(axes, origin)` separates the oriented
+basis, translation and axis lengths for a supplied host frame. `Curve::scalar`
+prepares deterministic scalar keys for repeated sampling; `Node::point_sps_curve`
+selects the single-channel Point motion case. `Curve::rgb` samples three color
+channels with their own segment and repeat rules. `Curve::random_amplitude`
+and `CurveRng` evaluate cached or per-sample variation with caller-owned state.
+`coordinate_refresh_allowed` tests the authored cutoff for a supplied local frame.
+`weapon_anchor` takes a caller-supplied
+owner frame and resolves the saw's Start through its actual MDL and SKLB.
 
 AVFX `.atex` bytes go directly to `tex::Tex::parse`, including all declared mips,
 image views and float-output support; SqPack type-2 extraction is valid for ATEX.
@@ -141,6 +150,11 @@ See [VFX evidence](docs/provenance/vfx.md) for the verified asset subset.
 
 `pap::Pap` reads Win32 `0x00020001` names, container-order animation indices and
 binding references, retaining unknown record/header bytes and timeline data.
+`Pap::timelines` reads embedded TMLB envelopes. For standalone `.tmb` bytes
+use `tmb::Timeline::parse_sequence`. `command_links` follows serialized
+actor/track/command IDs; `command_resource` and `effect_command` expose
+referenced assets, authored start/duration and C012 bind targets, transform,
+color and visibility. Unknown commands retain their tag and payload.
 Container-level Havok alignment is preserved in `havok_padding`: either no
 padding, or up to 15 zero bytes ending at a file-relative 16-byte boundary.
 Standalone Havok tagfile parsing rejects trailing bytes.
@@ -151,9 +165,12 @@ track/block/control/work budgets. Vector u8/u16 and quaternion polar32, 40-bit,
 48-bit and uncompressed encodings are handled; unknown encodings and nonzero
 float-track counts return errors, never identity placeholders. Samples use finite
 milliseconds clamped to the animation duration and explicit output/work budgets,
-returning track-space translation, normalized xyzw rotation and scale. Binding
-indices and raw blend hints remain separate; no additive composition or skeleton
-assembly is performed. See [PAP evidence](docs/provenance/animation.md).
+returning track-space translation, normalized xyzw rotation and scale.
+`Binding::mapped_samples` maps explicit track destinations to a sparse bone layer.
+Given a finalized local pose, `Skeleton::posed_point` maps a bone-local attachment
+origin into skeleton space, using rest TRS for unspecified bones. Additive layers
+must be composed by the caller first. See [PAP evidence](docs/provenance/animation.md)
+and the [motion and effects data chain](docs/motion-effects.md).
 Large borrowed animation byte arrays may require an explicit `max_array_length`
 in `Pap::parse_with_limits`; the default 1,000,000-element budget is not raised
 automatically. Allocation, value, spline-control and sampling budgets still apply.

@@ -523,6 +523,18 @@ fn all_tables_geometry_and_non_normal_roles_are_usable() {
     assert_eq!(model.bone_name(0).unwrap(), b"n_root");
     assert_eq!(model.bone_table(0).unwrap().collect::<Vec<_>>(), [0]);
     assert_eq!(model.element_id(0).unwrap().translation, [0.5, 0., 0.]);
+    let id = model.element_id(0).unwrap().id;
+    assert_eq!(
+        model.element_by_id(id, 1).unwrap().unwrap().translation,
+        [0.5, 0., 0.]
+    );
+    assert!(
+        model
+            .element_by_id(id.wrapping_add(1), 1)
+            .unwrap()
+            .is_none()
+    );
+    assert!(model.element_by_id(id, 0).is_err());
     let lod = model.lod(0).unwrap();
     assert_eq!(lod.ranges[6].role, MeshRole::Glass);
     assert_eq!(lod.ranges[6].start, 1);

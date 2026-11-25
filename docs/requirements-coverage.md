@@ -20,7 +20,7 @@
 | CMP | human.cmp 体型缩放参数 | `src/cmp.rs`、`tests/cmp.rs`；RGBA、八种族/五体型/两 clan 查询、height/tail/bust 范围和严格百分比数学接口；[格式](cmp/README.md) | [完整字段、静态消费和数学对照](provenance/cmp.md)：45568 色、1120 浮点位、560 对范围；指定 exe 的端点、坐标映射及百分比策略已定位，56560 个数学插值结果与独立有理数 oracle 逐位相等。其他颜色区变体、完整 NPC/body 回退、胸围骨空间与姿态应用仍有缺口 |
 | SKLB/Havok | 容器变体；骨名、父索引、局部 rest TRS；xyzw quaternion | `src/sklb.rs`、`src/havok`、`tests/havok.rs`；1200/1300 容器、v3 类/对象图、列式数组、参考姿态、animation container 对象关联；[SKLB](sklb/README.md)、[Havok](havok/README.md) | [七份真实文件](provenance/skeleton.md)：12 skeleton、1084 骨、13008 rest 系数位全部一致；父链无环、多个 mapper 侧 skeleton 与主引用已区分；其他 tagfile/容器版本及辅助区完整语义缺少样本证据 |
 | PBD | 种族关系、骨名、deform 矩阵 | `src/pbd`、`tests/pbd.rs`；借用主表/连接森林、预算受限无分配祖先路径、真实仿射系数、通用仿射乘积、EPBD/PACK 与内嵌 PBD；[格式](pbd/README.md) | [真实 human.pbd 全字段与静态消费证据](provenance/pbd.md)：5 张表、4215 骨矩阵、50580 浮点系数位；327680 次 ID 查询覆盖 46 次命中/5 次无载荷。1032 个路径下标对与独立 child/sibling BFS 一致，含全部 67 条非空路径。指定 exe 的标量、关系、祖先链有序乘积及一个 G×D 消费点已定位；4215 对实际系数的 139095 个通用数学分量独立比较通过。[标量消费链](provenance/pbd-scalar-consumer.md)关联具名参数与316个VS的湿润度运算，含条件性顶点位置依赖。完整 source/target/bind 空间、逆向变换策略、原始标量物理定义、实际绘制选择和 EPBD 条件仍有缺口，不以 rest-pose 近似替代 |
-| PAP | 名字、havok_index、binding、track-to-bone；所需 spline 动画必要解码 | `src/pap.rs`、`src/havok/spline.rs`、`tests/pap.rs`；Win32 v0x00020001、v0 spline、静态/动态/identity TRS、u8/u16、quaternion 0/1/2/5、毫秒采样、容器层 Havok 零对齐；[格式](pap/README.md) | [十个非空包](provenance/animation.md)：十五动画、228 块、5775950 TRS 分量与独立 oracle 一致，完整 binding 映射；210 轨道/173 块大包使用显式数组预算，全部内部边界与末块钳制已验。两轮各 2000 包的有界编码库存没有找到 float tracks/额外类型；该证据缺口与 blendHint 组合保留，时间线只保留原始字节（不执行） |
+| PAP | 名字、havok_index、binding、track-to-bone；所需 spline 动画必要解码 | `src/pap.rs`、`src/havok/spline.rs`、`tests/pap.rs`；Win32 v0x00020001、v0 spline、静态/动态/identity TRS、u8/u16、quaternion 0/1/2/5、毫秒采样、容器层 Havok 零对齐；[格式](pap/README.md) | [十个非空包](provenance/animation.md)：十五动画、228 块、5775950 TRS 分量与独立 oracle 一致，完整 binding 映射；210 轨道/173 块大包使用显式数组预算，全部内部边界与末块钳制已验。两轮各 2000 包的有界编码库存没有找到 float tracks/额外类型；blendHint 组合缺少验证。[内嵌 TMLB](provenance/motion-effects.md) 的列表和名称有四包对照，命令播放时序无运行证据 |
 | AVFX | global、scheduler/timeline、emitter/particle、binder/effector、曲线、纹理路径、内嵌模型、未知块 | `src/avfx{,/assets,/binder}.rs`、对应回归；六类节点、累计条目 wire 顺序/类型、31 种 Data 组合、纹理槽位/曲线、索引范围、绘制/发射几何、可选 binder 属性；[格式](avfx/README.md) | [六份基础及二十份扩展资产](provenance/vfx.md)：两批共 1826 参数、3097 引用；[40 个属性槽与三组武器](provenance/binder.md) 的六个 BPID→owner ElementId→骨名唯一匹配已验。宿主选择优先级、世界姿态合成及纹理播放不作为文件解析证明 |
 | ATEX | 纹理 mip/cube/浮点负载与必要像素解码 | 共用 `src/tex` 的 80 字节头、mip/image、RGBA8/RGBA32F，`tests/tex_layouts.rs`；[格式](atex/README.md) | [八份 AVFX 引用的 ATEX](provenance/vfx.md) 均为 type-2，含六面八 mip cube，共 106 图像、371367 像素独立 A8/BC1/BC2/BC3/BC7 对照；三份格式 owner 的完整 AVFX 行亦相等。VFX type-2 均匀10万条首块库存无 float/array/volume 候选，仅作有界负向证据；实际这些 ATEX 变体样本缺口保留 |
 | SGB | 家具 MDL 与关联 SGB 依赖发现；可靠结构边界 | `src/sgb.rs`、`tests/sgb.rs`；单 SCN1/单 group 家具 profile，layer/instance 相对偏移表，BG 与 SharedGroup 显式路径、三通道 TRS、未知类型公共头；[格式](sgb/README.md) | [general ID 1–2000 与关联闭包](provenance/sgb.md)：1930 根、2088 文件、15796 实例全公共字段/TRS/已解析路径独立一致；4064 模型、993 collision、288 SharedGroup 引用均可定位，无 profile 超界。九份定向样本的七份目标 MDL（33728 顶点）另有全几何对照；枚举不代表完整家具目录，多 scene/group 无实样本，其他类型负载/行为不作完整场景语义声明 |
@@ -322,7 +322,7 @@ shader像素效果不由这些数值回归代表。
 - 基础检查：`just check-all`（包括 WASM），文档：`nix develop -c notist build`。
 - 固定实资源联跑：`tools/verify_render_resources.py`，命令与报告规则见[回归入口](provenance/README.md#资源回归入口)；通过回归不等于消除本表缺口，已知错误复现单独分类。
 - 不启动游戏、不附加进程、不运行服务器/GPU 测试、不修改安装。
-- EST、TMB、GPU 渲染、角色装配、VFX 模拟、应用集成排除在此验收范围外。
+- EST、GPU 渲染、角色装配、VFX 模拟、应用集成排除在此验收范围外。TMB 动作命令与挂点另见[动作与特效的数据链](motion-effects.md)。
 
 ## 需求来源
 

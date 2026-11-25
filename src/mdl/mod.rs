@@ -815,6 +815,22 @@ impl<'a> Mdl<'a> {
             rotation: [f32_at(b, 20)?, f32_at(b, 24)?, f32_at(b, 28)?],
         })
     }
+
+    /// Look up an authored attachment ID (not a table index) on this owner.
+    /// Missing IDs are distinct from collisions between two owner records.
+    pub fn element_by_id(&self, id: u32, max_records: usize) -> Result<Option<ElementId>> {
+        if self.element_id_count() > max_records {
+            return Err(Error::BudgetExceeded("element lookup"));
+        }
+        let mut found = None;
+        for i in 0..self.element_id_count() {
+            let e = self.element_id(i)?;
+            if e.id == id && found.replace(e).is_some() {
+                return Err(Error::InvalidData("ambiguous owner element ID"));
+            }
+        }
+        Ok(found)
+    }
     pub fn shape(&self, index: usize) -> Result<Shape<'a>> {
         let b = record(self.shapes, index, 16)?;
         Ok(Shape {

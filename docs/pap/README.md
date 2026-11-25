@@ -38,7 +38,7 @@ Havok 段从 Havok offset 延伸到 timeline offset；后者到文件末尾属�
 该段包含以 end tag 结束的对象流，以及可选的零填充。观察到的 Win32 资源既有
 紧接对象流的时间线，也有把时间线起点对齐文件绝对偏移 16 字节的布局；填充
 长 0–15 字节，不属于 Havok 对象流。不能将段长度直接当成对象流消费长度。
-时间线内部布局及记录 `+32/+36` 字段含义没有独立确认。
+名字记录 `+32/+36` 字段含义没有独立确认。
 零记录的空包可完全没有 Havok 对象流：实样本的 records/Havok offset 均为 26，
 timeline offset 为 32，中间仅六字节零填充。零记录不隐含一个默认动画。
 
@@ -50,6 +50,36 @@ flowchart LR
     stream --> pad[Optional zero padding: 0 to 15 bytes]
     pad --> timeline[Timeline at stored absolute offset]
 """#)
+
+## 内嵌 TMLB 时间线
+
+Win32 动作包的 timeline 段可以连续容纳多个 TMLB。以下位置以 bit 为单位，
+原点为单个 TMLB 起点；整数为小端。长度以字节计，包含对应的头。
+
+#pele.diagram(r#"""
+packet
+0-31: "Magic: TMLB"
+32-63: "Envelope size: u32"
+64-95: "Entry count: u32"
+96-127: "First entry tag: four literal bytes"
+128-159: "First entry size: u32"
+"""#)
+
+从 `+12` 起按各条目的长度前进，遍历指定数量后即是尾区。尾区容纳 ID 列表和
+NUL 终止的名称，属于本 TMLB。样本中相邻 TMLB 之间有 0–3 个零字节，使下一个
+头相对段首按四字节对齐；最后一个可直接终止于声明长度。
+
+| 条目 | 总长（字节） | 字段与目标 |
+| --- | ---: | --- |
+| TMAL | 16 | 负载 `+0/+4`：列表偏移、数量，目标为 TMAC ID |
+| TMAC | 28 | 负载 `+12/+16`：列表偏移、数量，目标为 TMTR ID |
+| TMTR | 24 | 负载 `+4/+8`：列表偏移、数量，目标为命令 ID |
+| C009 | 24 | 负载 `+12`：名称偏移；观察到与 PAP 名字记录一致的名称 |
+
+表内偏移和数量均为 u32；**偏移原点是本条目的负载起点**（条目头后八字节）。
+列表元素为小端 u16。`sit.pap` 的 TMAL 负载从 TMLB `+36` 开始，偏移 108
+指向 `+144` 处的 ID 2；TMAC 再列出 ID 3、4，两条 TMTR 分别引用 ID 5 和空列表。
+引用值是记录标识；这些关系本身不规定命令执行时间或混合策略。
 
 ## Havok 对象关系
 

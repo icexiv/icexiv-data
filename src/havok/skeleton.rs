@@ -35,6 +35,115 @@ pub struct Skeleton<'a> {
     pub object_id: usize,
     pub bones: Vec<Bone<'a>>,
 }
+impl Skeleton<'_> {
+    /// Unique match for a raw MDL parent bone name in this selected skeleton.
+    /// Work bounds include comparisons of potentially long same-length names.
+    pub fn bone_by_name(&self, name: &[u8], mut max_work: usize) -> Result<Option<usize>> {
+        let mut found = None;
+        for (i, b) in self.bones.iter().enumerate() {
+            spend(&mut max_work, 1, "bone name lookup")?;
+            if b.name.len() != name.len() {
+                continue;
+            }
+            spend(&mut max_work, name.len(), "bone name comparison")?;
+            if b.name == name && found.replace(i).is_some() {
+                return Err("ambiguous bone name".into());
+            }
+        }
+        Ok(found)
+    }
+    /// Transform a bone-local point (e.g. an MDL ElementId translation) into
+    /// skeleton space. `pose` is a finalized sparse *absolute local* pose in
+    /// bone order, not an additive layer. None uses that bone's reference TRS.
+    /// Apply scale, quaternion rotation, then translation at each ancestor;
+    /// this retains the effect of rotated non-uniform parent scale.
+    pub fn posed_point(
+        &self,
+        bone: usize,
+        point: [f32; 3],
+        pose: &[Option<super::Sample>],
+        max_steps: usize,
+    ) -> Result<[f32; 3]> {
+        Ok(self.transform_frame(bone, [point], pose, max_steps)?[0])
+    }
+
+    /// Skeleton-space X/Y/Z basis vectors followed by the position of a
+    /// bone-local anchor. Directions never include translation; retains shear.
+    pub fn posed_frame(
+        &self,
+        bone: usize,
+        point: [f32; 3],
+        pose: &[Option<super::Sample>],
+        max_steps: usize,
+    ) -> Result<[[f32; 3]; 4]> {
+        self.transform_frame(
+            bone,
+            [[1., 0., 0.], [0., 1., 0.], [0., 0., 1.], point],
+            pose,
+            max_steps,
+        )
+    }
+
+    fn transform_frame<const N: usize>(
+        &self,
+        bone: usize,
+        frame: [[f32; 3]; N],
+        pose: &[Option<super::Sample>],
+        max_steps: usize,
+    ) -> Result<[[f32; 3]; N]> {
+        if pose.len() != self.bones.len() {
+            return Err("pose/skeleton size".into());
+        }
+        let mut at = Some(bone);
+        let mut remaining = max_steps;
+        let mut count = 0;
+        let mut frame = frame.map(|v| v.map(f64::from));
+        while let Some(i) = at {
+            let b = self.bones.get(i).ok_or("pose bone index")?;
+            if count == self.bones.len() {
+                return Err("pose parent cycle".into());
+            }
+            spend(&mut remaining, 1, "pose parent chain")?;
+            count += 1;
+            let local = pose[i].unwrap_or_else(|| super::Sample {
+                translation: std::array::from_fn(|j| b.rest.translation[j]),
+                rotation: b.rest.rotation,
+                scale: std::array::from_fn(|j| b.rest.scale[j]),
+            });
+            let [x, y, z, w] = local.rotation.map(f64::from);
+            let norm2 = x * x + y * y + z * z + w * w;
+            if norm2 == 0. || !norm2.is_finite() {
+                return Err("pose quaternion".into());
+            }
+            let cross = |a: [f64; 3], b: [f64; 3]| {
+                [
+                    a[1] * b[2] - a[2] * b[1],
+                    a[2] * b[0] - a[0] * b[2],
+                    a[0] * b[1] - a[1] * b[0],
+                ]
+            };
+            for (k, p) in frame.iter_mut().enumerate() {
+                let v = std::array::from_fn(|j| p[j] * f64::from(local.scale[j]));
+                let t = cross([x, y, z], v);
+                let u = cross([x, y, z], t);
+                *p = std::array::from_fn(|j| {
+                    v[j] + 2. * (w * t[j] + u[j]) / norm2
+                        + if k + 1 == N {
+                            f64::from(local.translation[j])
+                        } else {
+                            0.
+                        }
+                });
+            }
+            at = b.parent;
+        }
+        let frame = frame.map(|v| v.map(|x| x as f32));
+        if !frame.iter().flatten().all(|v| v.is_finite()) {
+            return Err("nonfinite posed frame".into());
+        }
+        Ok(frame)
+    }
+}
 impl<'a> Tagfile<'a> {
     /// IDs explicitly referenced by remembered hkaAnimationContainer objects,
     /// in container/array order. Mapper-side skeletons are not implicitly

@@ -36,6 +36,7 @@
 - [SKLB 骨架容器](sklb/README.md)
 - [Havok binary tagfile v3](havok/README.md)
 - [PAP 动画包](pap/README.md)
+- [TMB 动作时间线](tmb/README.md)
 - [AVFX 特效资产](avfx/README.md)
 - [ATEX 特效纹理](atex/README.md)
 - [SGB 共享场景与家具依赖](sgb/README.md)
@@ -47,6 +48,7 @@
 # Validation
 
 - [渲染需求覆盖](requirements-coverage.md)
+- [动作与特效的数据链](motion-effects.md)
 - @(collapsed: true)[来源与证据](provenance/README.md)
   - [Legacy 解析能力对照](provenance/legacy-coverage.md)
   - [实资源变异安全验证](provenance/input-safety.md)
@@ -77,6 +79,7 @@
   - [PAP 样本观察](provenance/animation.md)
   - [AVFX / ATEX 证据](provenance/vfx.md)
   - [Binder 武器宿主元数据证据](provenance/binder.md)
+  - [手锯与 PAP 时间线证据](provenance/motion-effects.md)
   - [SGB 家具依赖证据](provenance/sgb.md)
   - [EXH / EXD 实际表证据](provenance/excel.md)
 

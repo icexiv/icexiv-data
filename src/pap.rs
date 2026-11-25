@@ -1,5 +1,6 @@
 //! Win32 PAP 0x00020001 animation records and Havok binding relationships.
 //! Timeline bytes are retained; no timeline execution or character assembly.
+use crate::tmb::{Timeline, TimelineLimits};
 use crate::{
     binary::{u16_at, u32_at},
     havok::{self, Tagfile, Value},
@@ -31,6 +32,38 @@ pub struct Binding<'a> {
     pub float_track_to_slot: &'a [i64],
     pub blend_hint: i64,
 }
+
+impl Binding<'_> {
+    /// Scatter a clip's sampled tracks into the selected skeleton's bone order.
+    /// Unmapped bones remain None. This is a sparse layer: no additive blend,
+    /// rest-pose substitution, or implicit track order is assumed.
+    pub fn mapped_samples(
+        self,
+        samples: &[havok::Sample],
+        bone_count: usize,
+        max_output_bytes: usize,
+    ) -> Result<Vec<Option<havok::Sample>>> {
+        if samples.len() != self.transform_track_to_bone.len() {
+            return Err("explicit transform map required for sampled tracks".into());
+        }
+        let mut bytes = max_output_bytes;
+        let mut bones = havok::reserve(bone_count, &mut bytes)?;
+        bones.resize(bone_count, None);
+        for (&index, sample) in self.transform_track_to_bone.iter().zip(samples) {
+            if index == -1 {
+                continue;
+            }
+            let dest = usize::try_from(index)
+                .ok()
+                .and_then(|i| bones.get_mut(i))
+                .ok_or("transform map outside selected skeleton")?;
+            if dest.replace(*sample).is_some() {
+                return Err("duplicate transform track destination".into());
+            }
+        }
+        Ok(bones)
+    }
+}
 fn refs<'b>(o: &'b havok::Object<'_>, name: &[u8]) -> Result<&'b [Value<'b>]> {
     match o.field(name) {
         Some(Value::Array(a)) => Ok(a),
@@ -44,6 +77,10 @@ fn reference(v: &Value<'_>) -> Result<usize> {
     }
 }
 impl<'a> Pap<'a> {
+    /// Inspect the TMLB envelopes independently of Havok sampling.
+    pub fn timelines(&self, limits: TimelineLimits) -> Result<Vec<Timeline<'a>>> {
+        Timeline::parse_sequence(self.timeline, limits)
+    }
     pub fn parse(bytes: &'a [u8]) -> Result<Self> {
         Self::parse_with_limits(bytes, havok::Limits::default())
     }

@@ -18,3 +18,4 @@ pub mod sklb;
 pub mod sqpack;
 pub mod stm;
 pub mod tex;
+pub mod tmb;

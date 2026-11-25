@@ -275,6 +275,37 @@ pub enum Value<'data> {
 }
 
 impl<'data> Row<'data, '_> {
+    /// Signed ActionTimeline row reference from the 64-byte, 71-column
+    /// Action sheet layout. Caller selects the sheet; EXH has no sheet name.
+    pub fn action_timeline_id(&self) -> Result<i16> {
+        if self.header.fixed_row_size() != 64
+            || self.header.columns().len() != 71
+            || self.header.columns()[7].offset != 32
+            || self.subrow_id.is_some()
+        {
+            return Err(Error::InvalidData("Action timeline column layout"));
+        }
+        match self.field(7)? {
+            Value::Int16(v) => Ok(v),
+            _ => Err(Error::InvalidData("Action timeline column type")),
+        }
+    }
+
+    /// Byte key in the 24-byte, 22-column ActionTimeline layout. Empty keys
+    /// remain empty. The caller owns expansion to a logical resource path.
+    pub fn action_timeline_key(&self) -> Result<&'data [u8]> {
+        if self.header.fixed_row_size() != 24
+            || self.header.columns().len() != 22
+            || self.header.columns()[6].offset != 0
+            || self.subrow_id.is_some()
+        {
+            return Err(Error::InvalidData("ActionTimeline key layout"));
+        }
+        match self.field(6)? {
+            Value::String(v) => Ok(v),
+            _ => Err(Error::InvalidData("ActionTimeline key type")),
+        }
+    }
     pub fn id(&self) -> u32 {
         self.id
     }
